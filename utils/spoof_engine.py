@@ -1,62 +1,91 @@
+import serial
+import time
 import json
 import os
 
+
 class SpoofEngine:
-    def __init__(self):
-        self.profiles_file = "mouse_profiles/profiles.json"
-        self.load_profiles()
-    
-    def load_profiles(self):
-        """Carrega os perfis de mouse"""
-        default_profiles = {
-            "Logitech": {
-                "G502": {
-                    "vid": "0x046D", 
-                    "pid": "0xC08B",
-                    "vendor": "Logitech",
-                    "product": "G502 HERO",
-                    "description": "Logitech G502 HERO Gaming Mouse"
-                },
-                "G903": {
-                    "vid": "0x046D", 
-                    "pid": "0xC087",
-                    "vendor": "Logitech",
-                    "product": "G903 LIGHTSPEED",
-                    "description": "Logitech G903 Wireless Gaming Mouse"
-                }
-            },
-            "Razer": {
-                "DeathAdder V2": {
-                    "vid": "0x1532", 
-                    "pid": "0x0067",
-                    "vendor": "Razer",
-                    "product": "DeathAdder V2",
-                    "description": "Razer DeathAdder V2 Gaming Mouse"
-                }
-            }
-        }
-        
-        os.makedirs("mouse_profiles", exist_ok=True)
-        if not os.path.exists(self.profiles_file):
-            with open(self.profiles_file, 'w') as f:
-                json.dump(default_profiles, f, indent=2)
-        
-        with open(self.profiles_file, 'r') as f:
-            return json.load(f)
-    
+    def __init__(self, port=None, baud_rate=115200, timeout=2):
+        self.port = port
+        self.baud_rate = baud_rate
+        self.timeout = timeout
+        self.ser = None
+
+    # ---------------- Conexão ----------------
+    def connect(self):
+        try:
+            if not self.port:
+                return False
+            self.ser = serial.Serial(self.port, self.baud_rate, timeout=self.timeout)
+            time.sleep(1)
+            return True
+        except Exception as e:
+            print(f"[ERRO] Falha ao conectar: {e}")
+            return False
+
+    def disconnect(self):
+        if self.ser and self.ser.is_open:
+            self.ser.close()
+
+    # ---------------- Comunicação ----------------
+    def send(self, command):
+        """
+        Envia comando ao Arduino e retorna resposta.
+        Retorna sempre (success: bool, response: str|dict).
+        """
+        try:
+            if not self.ser or not self.ser.is_open:
+                return False, "No connection"
+
+            self.ser.reset_input_buffer()
+            self.ser.write(f"{command}\n".encode())
+            time.sleep(0.5)
+
+            response = ""
+            while self.ser.in_waiting > 0:
+                line = self.ser.readline().decode(errors="ignore").strip()
+                if line:
+                    response += line
+
+            if not response:
+                return False, "No response"
+
+            # tenta converter para JSON
+            try:
+                parsed = json.loads(response)
+                return True, parsed
+            except Exception:
+                return True, response  # devolve string bruta
+
+        except Exception as e:
+            return False, str(e)
+
+    # ---------------- Comandos ----------------
+    def get_status(self):
+        return self.send("STATUS")
+
+    def reset(self):
+        return self.send("RESET")
+
+    def spoof(self):
+        return self.send("SPOOF")
+
+    # ---------------- Perfis ----------------
+    def load_profiles(self, filename="mouse_profiles/profiles.json"):
+        """
+        Carrega perfis de mouse.
+        """
+        try:
+            if not os.path.exists(filename):
+                print(f"[AVISO] Arquivo de perfis não encontrado: {filename}")
+                return {}
+
+            with open(filename, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"[ERRO] Falha ao carregar perfis: {e}")
+            return {}
+
     def get_profile(self, brand, model):
-        """Obtém perfil específico do mouse"""
         profiles = self.load_profiles()
-        return profiles.get(brand, {}).get(model, {})
-    
-    def add_profile(self, brand, model, profile_data):
-        """Adiciona novo perfil"""
-        profiles = self.load_profiles()
-        
-        if brand not in profiles:
-            profiles[brand] = {}
-        
-        profiles[brand][model] = profile_data
-        
-        with open(self.profiles_file, 'w') as f:
-            json.dump(profiles, f, indent=2)
+        return profiles.get(brand, {}).get(model)
