@@ -1,494 +1,775 @@
 {
+  "Arduino": {
+    "Leonardo": {
+      "name": "Arduino Leonardo",
+      "vid": "0x2341",
+      "pid": "0x8036",
+      "vendor": "Arduino",
+      "product": "Arduino Leonardo",
+      "description": "Arduino Leonardo Development Board",
+      "manufacturer": "Arduino LLC"
+    }
+  },
   "Logitech": {
-    "G502": {
+    "G502 HERO": {
+      "name": "Logitech G502 HERO",
       "vid": "0x046D",
       "pid": "0xC08B",
       "vendor": "Logitech",
-      "product": "G502 HERO",
-      "description": "Logitech G502 HERO Gaming Mouse"
+      "product": "G502 HERO Gaming Mouse",
+      "description": "Logitech G502 HERO High Performance Gaming Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech G502 HERO Gaming Mouse",
+      "usb_manufacturer": "Logitech"
     },
     "G903": {
+      "name": "Logitech G903",
       "vid": "0x046D",
       "pid": "0xC087",
       "vendor": "Logitech",
       "product": "G903 LIGHTSPEED",
-      "description": "Logitech G903 Wireless Gaming Mouse"
+      "description": "Logitech G903 Wireless Gaming Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech G903 LIGHTSPEED Wireless Gaming Mouse",
+      "usb_manufacturer": "Logitech"
     },
     "G Pro X Superlight": {
+      "name": "Logitech G Pro X Superlight",
       "vid": "0x046D",
       "pid": "0x4082",
       "vendor": "Logitech",
       "product": "G Pro X Superlight",
-      "description": "Logitech G Pro X Superlight Wireless"
+      "description": "Logitech G Pro X Superlight Wireless Gaming Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech G Pro X Superlight Wireless",
+      "usb_manufacturer": "Logitech"
     },
     "G703": {
+      "name": "Logitech G703",
       "vid": "0x046D",
       "pid": "0xC087",
       "vendor": "Logitech",
       "product": "G703",
-      "description": "Logitech G703 Lightspeed"
+      "description": "Logitech G703 Lightspeed Wireless Gaming Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech G703 LIGHTSPEED Wireless Gaming Mouse",
+      "usb_manufacturer": "Logitech"
     },
     "MX Master 3": {
+      "name": "Logitech MX Master 3",
       "vid": "0x046D",
       "pid": "0xC52B",
       "vendor": "Logitech",
       "product": "MX Master 3",
-      "description": "Logitech MX Master 3 Wireless Mouse"
+      "description": "Logitech MX Master 3 Wireless Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech MX Master 3",
+      "usb_manufacturer": "Logitech"
     },
     "G305": {
+      "name": "Logitech G305",
       "vid": "0x046D",
       "pid": "0xC539",
       "vendor": "Logitech",
       "product": "G305",
-      "description": "Logitech G305 Wireless Gaming Mouse"
+      "description": "Logitech G305 Wireless Gaming Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech G305 LIGHTSPEED Wireless Gaming Mouse",
+      "usb_manufacturer": "Logitech"
     },
     "G600": {
+      "name": "Logitech G600",
       "vid": "0x046D",
       "pid": "0xC24A",
       "vendor": "Logitech",
       "product": "G600",
-      "description": "Logitech G600 MMO Gaming Mouse"
+      "description": "Logitech G600 MMO Gaming Mouse",
+      "manufacturer": "Logitech",
+      "usb_product": "Logitech G600 MMO Gaming Mouse",
+      "usb_manufacturer": "Logitech"
     }
   },
   "Razer": {
     "DeathAdder V2": {
+      "name": "Razer DeathAdder V2",
       "vid": "0x1532",
       "pid": "0x0067",
       "vendor": "Razer",
       "product": "DeathAdder V2",
-      "description": "Razer DeathAdder V2 Gaming Mouse"
+      "description": "Razer DeathAdder V2 Gaming Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer DeathAdder V2",
+      "usb_manufacturer": "Razer"
     },
     "Viper Ultimate": {
+      "name": "Razer Viper Ultimate",
       "vid": "0x1532",
       "pid": "0x0084",
       "vendor": "Razer",
       "product": "Viper Ultimate",
-      "description": "Razer Viper Ultimate Wireless"
+      "description": "Razer Viper Ultimate Wireless Gaming Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer Viper Ultimate",
+      "usb_manufacturer": "Razer"
     },
     "Basilisk V3": {
+      "name": "Razer Basilisk V3",
       "vid": "0x1532",
       "pid": "0x0094",
       "vendor": "Razer",
       "product": "Basilisk V3",
-      "description": "Razer Basilisk V3"
+      "description": "Razer Basilisk V3 Gaming Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer Basilisk V3",
+      "usb_manufacturer": "Razer"
     },
     "Naga Trinity": {
+      "name": "Razer Naga Trinity",
       "vid": "0x1532",
       "pid": "0x006E",
       "vendor": "Razer",
       "product": "Naga Trinity",
-      "description": "Razer Naga Trinity MMO Mouse"
+      "description": "Razer Naga Trinity MMO Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer Naga Trinity",
+      "usb_manufacturer": "Razer"
     },
     "Orochi V2": {
+      "name": "Razer Orochi V2",
       "vid": "0x1532",
       "pid": "0x0095",
       "vendor": "Razer",
       "product": "Orochi V2",
-      "description": "Razer Orochi V2 Wireless"
+      "description": "Razer Orochi V2 Wireless Gaming Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer Orochi V2",
+      "usb_manufacturer": "Razer"
     },
     "Mamba Elite": {
+      "name": "Razer Mamba Elite",
       "vid": "0x1532",
       "pid": "0x0079",
       "vendor": "Razer",
       "product": "Mamba Elite",
-      "description": "Razer Mamba Elite Gaming Mouse"
+      "description": "Razer Mamba Elite Gaming Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer Mamba Elite",
+      "usb_manufacturer": "Razer"
     },
     "Lancehead": {
+      "name": "Razer Lancehead",
       "vid": "0x1532",
       "pid": "0x007B",
       "vendor": "Razer",
       "product": "Lancehead",
-      "description": "Razer Lancehead Wireless Gaming Mouse"
+      "description": "Razer Lancehead Wireless Gaming Mouse",
+      "manufacturer": "Razer Inc.",
+      "usb_product": "Razer Lancehead Tournament Edition",
+      "usb_manufacturer": "Razer"
     }
   },
   "Bloody": {
     "A70": {
+      "name": "Bloody A70",
       "vid": "0x09DA",
       "pid": "0x9090",
       "vendor": "Bloody",
       "product": "A70",
-      "description": "Bloody A70 Gaming Mouse"
+      "description": "Bloody A70 Gaming Mouse",
+      "manufacturer": "Bloody",
+      "usb_product": "Bloody A70 Gaming Mouse",
+      "usb_manufacturer": "Bloody"
     },
     "A60": {
+      "name": "Bloody A60",
       "vid": "0x09DA",
       "pid": "0x9091",
       "vendor": "Bloody",
       "product": "A60",
-      "description": "Bloody A60 Gaming Mouse"
+      "description": "Bloody A60 Gaming Mouse",
+      "manufacturer": "Bloody",
+      "usb_product": "Bloody A60 Gaming Mouse",
+      "usb_manufacturer": "Bloody"
     },
     "B740": {
+      "name": "Bloody B740",
       "vid": "0x09DA",
       "pid": "0x2540",
       "vendor": "Bloody",
       "product": "B740",
-      "description": "Bloody B740 Gaming Mouse"
+      "description": "Bloody B740 Gaming Mouse",
+      "manufacturer": "Bloody",
+      "usb_product": "Bloody B740 Gaming Mouse",
+      "usb_manufacturer": "Bloody"
     },
     "J95": {
+      "name": "Bloody J95",
       "vid": "0x09DA",
       "pid": "0x1F40",
       "vendor": "Bloody",
       "product": "J95",
-      "description": "Bloody J95 RGB Gaming Mouse"
+      "description": "Bloody J95 RGB Gaming Mouse",
+      "manufacturer": "Bloody",
+      "usb_product": "Bloody J95 RGB Gaming Mouse",
+      "usb_manufacturer": "Bloody"
     }
   },
   "Redragon": {
     "M711": {
+      "name": "Redragon M711",
       "vid": "0x04D9",
       "pid": "0xFC30",
       "vendor": "Redragon",
       "product": "M711",
-      "description": "Redragon M711 Cobra Gaming Mouse"
+      "description": "Redragon M711 Cobra Gaming Mouse",
+      "manufacturer": "Redragon",
+      "usb_product": "Redragon M711 Cobra",
+      "usb_manufacturer": "Redragon"
     },
     "M908": {
+      "name": "Redragon M908",
       "vid": "0x04D9",
       "pid": "0xFC2D",
       "vendor": "Redragon",
       "product": "M908",
-      "description": "Redragon M908 Impact MMO Mouse"
+      "description": "Redragon M908 Impact MMO Mouse",
+      "manufacturer": "Redragon",
+      "usb_product": "Redragon M908 Impact",
+      "usb_manufacturer": "Redragon"
     },
     "M801": {
+      "name": "Redragon M801",
       "vid": "0x04D9",
       "pid": "0xFC39",
       "vendor": "Redragon",
       "product": "M801",
-      "description": "Redragon M801 Mammoth Gaming Mouse"
+      "description": "Redragon M801 Mammoth Gaming Mouse",
+      "manufacturer": "Redragon",
+      "usb_product": "Redragon M801 Mammoth",
+      "usb_manufacturer": "Redragon"
     },
     "M913": {
+      "name": "Redragon M913",
       "vid": "0x04D9",
       "pid": "0xFC2E",
       "vendor": "Redragon",
       "product": "M913",
-      "description": "Redragon M913 Wireless MMO Mouse"
+      "description": "Redragon M913 Wireless MMO Mouse",
+      "manufacturer": "Redragon",
+      "usb_product": "Redragon M913 Wireless",
+      "usb_manufacturer": "Redragon"
     }
   },
   "SteelSeries": {
     "Rival 600": {
+      "name": "SteelSeries Rival 600",
       "vid": "0x1038",
       "pid": "0x1720",
       "vendor": "SteelSeries",
       "product": "Rival 600",
-      "description": "SteelSeries Rival 600 Gaming Mouse"
+      "description": "SteelSeries Rival 600 Gaming Mouse",
+      "manufacturer": "SteelSeries",
+      "usb_product": "SteelSeries Rival 600 Gaming Mouse",
+      "usb_manufacturer": "SteelSeries"
     },
     "Aerox 3": {
+      "name": "SteelSeries Aerox 3",
       "vid": "0x1038",
       "pid": "0x1830",
       "vendor": "SteelSeries",
       "product": "Aerox 3",
-      "description": "SteelSeries Aerox 3 Wireless"
+      "description": "SteelSeries Aerox 3 Wireless Gaming Mouse",
+      "manufacturer": "SteelSeries",
+      "usb_product": "SteelSeries Aerox 3 Wireless",
+      "usb_manufacturer": "SteelSeries"
     },
     "Prime Wireless": {
+      "name": "SteelSeries Prime Wireless",
       "vid": "0x1038",
       "pid": "0x1820",
       "vendor": "SteelSeries",
       "product": "Prime Wireless",
-      "description": "SteelSeries Prime Wireless Mouse"
+      "description": "SteelSeries Prime Wireless Mouse",
+      "manufacturer": "SteelSeries",
+      "usb_product": "SteelSeries Prime Wireless",
+      "usb_manufacturer": "SteelSeries"
     },
     "Sensei Ten": {
+      "name": "SteelSeries Sensei Ten",
       "vid": "0x1038",
       "pid": "0x1824",
       "vendor": "SteelSeries",
       "product": "Sensei Ten",
-      "description": "SteelSeries Sensei Ten Gaming Mouse"
+      "description": "SteelSeries Sensei Ten Gaming Mouse",
+      "manufacturer": "SteelSeries",
+      "usb_product": "SteelSeries Sensei Ten",
+      "usb_manufacturer": "SteelSeries"
     }
   },
   "Corsair": {
     "Dark Core RGB Pro": {
+      "name": "Corsair Dark Core RGB Pro",
       "vid": "0x1B1C",
       "pid": "0x1B5E",
       "vendor": "Corsair",
       "product": "Dark Core RGB Pro",
-      "description": "Corsair Dark Core RGB Pro Wireless"
+      "description": "Corsair Dark Core RGB Pro Wireless Gaming Mouse",
+      "manufacturer": "Corsair",
+      "usb_product": "Corsair Dark Core RGB Pro SE",
+      "usb_manufacturer": "Corsair"
     },
     "Ironclaw RGB": {
+      "name": "Corsair Ironclaw RGB",
       "vid": "0x1B1C",
       "pid": "0x1B2D",
       "vendor": "Corsair",
       "product": "Ironclaw RGB",
-      "description": "Corsair Ironclaw RGB Gaming Mouse"
+      "description": "Corsair Ironclaw RGB Gaming Mouse",
+      "manufacturer": "Corsair",
+      "usb_product": "Corsair Ironclaw RGB",
+      "usb_manufacturer": "Corsair"
     },
     "Scimitar RGB Elite": {
+      "name": "Corsair Scimitar RGB Elite",
       "vid": "0x1B1C",
       "pid": "0x1B3E",
       "vendor": "Corsair",
       "product": "Scimitar RGB Elite",
-      "description": "Corsair Scimitar RGB Elite MMO Mouse"
+      "description": "Corsair Scimitar RGB Elite MMO Mouse",
+      "manufacturer": "Corsair",
+      "usb_product": "Corsair Scimitar RGB Elite",
+      "usb_manufacturer": "Corsair"
     },
     "Harpoon RGB Wireless": {
+      "name": "Corsair Harpoon RGB Wireless",
       "vid": "0x1B1C",
       "pid": "0x1B3D",
       "vendor": "Corsair",
       "product": "Harpoon RGB Wireless",
-      "description": "Corsair Harpoon RGB Wireless Mouse"
+      "description": "Corsair Harpoon RGB Wireless Mouse",
+      "manufacturer": "Corsair",
+      "usb_product": "Corsair Harpoon RGB Wireless",
+      "usb_manufacturer": "Corsair"
     }
   },
   "HyperX": {
     "Pulsefire Haste": {
+      "name": "HyperX Pulsefire Haste",
       "vid": "0x03F0",
       "pid": "0x2D4A",
       "vendor": "HyperX",
       "product": "Pulsefire Haste",
-      "description": "HyperX Pulsefire Haste Gaming Mouse"
+      "description": "HyperX Pulsefire Haste Gaming Mouse",
+      "manufacturer": "HyperX",
+      "usb_product": "HyperX Pulsefire Haste",
+      "usb_manufacturer": "HyperX"
     },
     "Pulsefire Raid": {
+      "name": "HyperX Pulsefire Raid",
       "vid": "0x03F0",
       "pid": "0x0F4A",
       "vendor": "HyperX",
       "product": "Pulsefire Raid",
-      "description": "HyperX Pulsefire Raid Gaming Mouse"
+      "description": "HyperX Pulsefire Raid Gaming Mouse",
+      "manufacturer": "HyperX",
+      "usb_product": "HyperX Pulsefire Raid",
+      "usb_manufacturer": "HyperX"
     },
     "Pulsefire Core": {
+      "name": "HyperX Pulsefire Core",
       "vid": "0x03F0",
       "pid": "0x094A",
       "vendor": "HyperX",
       "product": "Pulsefire Core",
-      "description": "HyperX Pulsefire Core Gaming Mouse"
+      "description": "HyperX Pulsefire Core Gaming Mouse",
+      "manufacturer": "HyperX",
+      "usb_product": "HyperX Pulsefire Core",
+      "usb_manufacturer": "HyperX"
     }
   },
   "Zowie": {
     "EC2": {
+      "name": "Zowie EC2",
       "vid": "0x062A",
       "pid": "0x5918",
       "vendor": "Zowie",
       "product": "EC2",
-      "description": "Zowie EC2 Gaming Mouse"
+      "description": "Zowie EC2 Gaming Mouse",
+      "manufacturer": "Zowie",
+      "usb_product": "Zowie EC2",
+      "usb_manufacturer": "Zowie"
     },
     "FK2": {
+      "name": "Zowie FK2",
       "vid": "0x062A",
       "pid": "0x5918",
       "vendor": "Zowie",
       "product": "FK2",
-      "description": "Zowie FK2 Gaming Mouse"
+      "description": "Zowie FK2 Gaming Mouse",
+      "manufacturer": "Zowie",
+      "usb_product": "Zowie FK2",
+      "usb_manufacturer": "Zowie"
     },
     "ZA13": {
+      "name": "Zowie ZA13",
       "vid": "0x062A",
       "pid": "0x5918",
       "vendor": "Zowie",
       "product": "ZA13",
-      "description": "Zowie ZA13 Gaming Mouse"
+      "description": "Zowie ZA13 Gaming Mouse",
+      "manufacturer": "Zowie",
+      "usb_product": "Zowie ZA13",
+      "usb_manufacturer": "Zowie"
     }
   },
   "FinalMouse": {
     "Starlight-12": {
+      "name": "FinalMouse Starlight-12",
       "vid": "0x258A",
       "pid": "0x1007",
       "vendor": "FinalMouse",
       "product": "Starlight-12",
-      "description": "FinalMouse Starlight-12"
+      "description": "FinalMouse Starlight-12 Ultralight",
+      "manufacturer": "FinalMouse",
+      "usb_product": "FinalMouse Starlight-12",
+      "usb_manufacturer": "FinalMouse"
     },
     "Ultralight 2": {
+      "name": "FinalMouse Ultralight 2",
       "vid": "0x258A",
       "pid": "0x1006",
       "vendor": "FinalMouse",
       "product": "Ultralight 2",
-      "description": "FinalMouse Ultralight 2 Cape Town"
+      "description": "FinalMouse Ultralight 2 Cape Town",
+      "manufacturer": "FinalMouse",
+      "usb_product": "FinalMouse Ultralight 2",
+      "usb_manufacturer": "FinalMouse"
     }
   },
   "Glorious": {
     "Model O": {
+      "name": "Glorious Model O",
       "vid": "0x258A",
       "pid": "0x1007",
       "vendor": "Glorious",
       "product": "Model O",
-      "description": "Glorious Model O Gaming Mouse"
+      "description": "Glorious Model O Gaming Mouse",
+      "manufacturer": "Glorious LLC",
+      "usb_product": "Glorious Model O",
+      "usb_manufacturer": "Glorious"
     },
     "Model D": {
+      "name": "Glorious Model D",
       "vid": "0x258A",
       "pid": "0x1007",
       "vendor": "Glorious",
       "product": "Model D",
-      "description": "Glorious Model D Gaming Mouse"
+      "description": "Glorious Model D Gaming Mouse",
+      "manufacturer": "Glorious LLC",
+      "usb_product": "Glorious Model D",
+      "usb_manufacturer": "Glorious"
     },
     "Model O Wireless": {
+      "name": "Glorious Model O Wireless",
       "vid": "0x258A",
       "pid": "0x2010",
       "vendor": "Glorious",
       "product": "Model O Wireless",
-      "description": "Glorious Model O Wireless Gaming Mouse"
+      "description": "Glorious Model O Wireless Gaming Mouse",
+      "manufacturer": "Glorious LLC",
+      "usb_product": "Glorious Model O Wireless",
+      "usb_manufacturer": "Glorious"
     }
   },
   "Cooler Master": {
     "MM710": {
+      "name": "Cooler Master MM710",
       "vid": "0x2516",
       "pid": "0x0104",
       "vendor": "Cooler Master",
       "product": "MM710",
-      "description": "Cooler Master MM710 Lightweight Mouse"
+      "description": "Cooler Master MM710 Lightweight Mouse",
+      "manufacturer": "Cooler Master",
+      "usb_product": "Cooler Master MM710",
+      "usb_manufacturer": "Cooler Master"
     },
     "MM720": {
+      "name": "Cooler Master MM720",
       "vid": "0x2516",
       "pid": "0x0114",
       "vendor": "Cooler Master",
       "product": "MM720",
-      "description": "Cooler Master MM720 Ergonomic Mouse"
+      "description": "Cooler Master MM720 Ergonomic Mouse",
+      "manufacturer": "Cooler Master",
+      "usb_product": "Cooler Master MM720",
+      "usb_manufacturer": "Cooler Master"
     }
   },
   "Roccat": {
     "Kone AIMO": {
+      "name": "Roccat Kone AIMO",
       "vid": "0x1E7D",
       "pid": "0x2E4A",
       "vendor": "Roccat",
       "product": "Kone AIMO",
-      "description": "Roccat Kone AIMO RGB Mouse"
+      "description": "Roccat Kone AIMO RGB Mouse",
+      "manufacturer": "Roccat",
+      "usb_product": "Roccat Kone AIMO",
+      "usb_manufacturer": "Roccat"
     },
     "Burst Pro": {
+      "name": "Roccat Burst Pro",
       "vid": "0x1E7D",
       "pid": "0x2E4C",
       "vendor": "Roccat",
       "product": "Burst Pro",
-      "description": "Roccat Burst Pro Gaming Mouse"
+      "description": "Roccat Burst Pro Gaming Mouse",
+      "manufacturer": "Roccat",
+      "usb_product": "Roccat Burst Pro",
+      "usb_manufacturer": "Roccat"
     }
   },
   "ASUS ROG": {
     "Gladius III": {
+      "name": "ASUS ROG Gladius III",
       "vid": "0x0B05",
       "pid": "0x18F3",
       "vendor": "ASUS",
       "product": "Gladius III",
-      "description": "ASUS ROG Gladius III Wireless"
+      "description": "ASUS ROG Gladius III Wireless Gaming Mouse",
+      "manufacturer": "ASUS",
+      "usb_product": "ROG Gladius III Wireless",
+      "usb_manufacturer": "ASUS"
     },
     "Keresis": {
+      "name": "ASUS ROG Keresis",
       "vid": "0x0B05",
       "pid": "0x18F1",
       "vendor": "ASUS",
       "product": "Keresis",
-      "description": "ASUS ROG Keresis Gaming Mouse"
+      "description": "ASUS ROG Keresis Gaming Mouse",
+      "manufacturer": "ASUS",
+      "usb_product": "ROG Keresis",
+      "usb_manufacturer": "ASUS"
     },
     "Chakram": {
+      "name": "ASUS ROG Chakram",
       "vid": "0x0B05",
       "pid": "0x18F2",
       "vendor": "ASUS",
       "product": "Chakram",
-      "description": "ASUS ROG Chakram Wireless Gaming Mouse"
+      "description": "ASUS ROG Chakram Wireless Gaming Mouse",
+      "manufacturer": "ASUS",
+      "usb_product": "ROG Chakram",
+      "usb_manufacturer": "ASUS"
     }
   },
   "MSI": {
     "Clutch GM41": {
+      "name": "MSI Clutch GM41",
       "vid": "0x1770",
       "pid": "0xFF41",
       "vendor": "MSI",
       "product": "Clutch GM41",
-      "description": "MSI Clutch GM41 Lightweight Wireless"
+      "description": "MSI Clutch GM41 Lightweight Wireless Gaming Mouse",
+      "manufacturer": "MSI",
+      "usb_product": "MSI Clutch GM41 Wireless",
+      "usb_manufacturer": "MSI"
     },
     "Clutch GM20": {
+      "name": "MSI Clutch GM20",
       "vid": "0x1770",
       "pid": "0xFF20",
       "vendor": "MSI",
       "product": "Clutch GM20",
-      "description": "MSI Clutch GM20 Elite Gaming Mouse"
+      "description": "MSI Clutch GM20 Elite Gaming Mouse",
+      "manufacturer": "MSI",
+      "usb_product": "MSI Clutch GM20",
+      "usb_manufacturer": "MSI"
     }
   },
   "EVGA": {
     "X17": {
+      "name": "EVGA X17",
       "vid": "0x3842",
       "pid": "0x2701",
       "vendor": "EVGA",
       "product": "X17",
-      "description": "EVGA X17 Gaming Mouse"
+      "description": "EVGA X17 Gaming Mouse",
+      "manufacturer": "EVGA",
+      "usb_product": "EVGA X17 Gaming Mouse",
+      "usb_manufacturer": "EVGA"
     },
     "X20": {
+      "name": "EVGA X20",
       "vid": "0x3842",
       "pid": "0x2702",
       "vendor": "EVGA",
       "product": "X20",
-      "description": "EVGA X20 Wireless Gaming Mouse"
+      "description": "EVGA X20 Wireless Gaming Mouse",
+      "manufacturer": "EVGA",
+      "usb_product": "EVGA X20 Wireless",
+      "usb_manufacturer": "EVGA"
     }
   },
   "Alienware": {
     "AW610M": {
+      "name": "Alienware AW610M",
       "vid": "0x0461",
       "pid": "0x4D81",
       "vendor": "Alienware",
       "product": "AW610M",
-      "description": "Alienware AW610M Wireless Gaming Mouse"
+      "description": "Alienware AW610M Wireless Gaming Mouse",
+      "manufacturer": "Alienware",
+      "usb_product": "Alienware AW610M Wireless",
+      "usb_manufacturer": "Alienware"
     },
     "AW510M": {
+      "name": "Alienware AW510M",
       "vid": "0x0461",
       "pid": "0x4D82",
       "vendor": "Alienware",
       "product": "AW510M",
-      "description": "Alienware AW510M Wired Gaming Mouse"
+      "description": "Alienware AW510M Wired Gaming Mouse",
+      "manufacturer": "Alienware",
+      "usb_product": "Alienware AW510M",
+      "usb_manufacturer": "Alienware"
     }
   },
   "Mad Catz": {
     "RAT 8+": {
+      "name": "Mad Catz RAT 8+",
       "vid": "0x0738",
       "pid": "0x1708",
       "vendor": "Mad Catz",
       "product": "RAT 8+",
-      "description": "Mad Catz R.A.T. 8+ Gaming Mouse"
+      "description": "Mad Catz R.A.T. 8+ Gaming Mouse",
+      "manufacturer": "Mad Catz",
+      "usb_product": "Mad Catz R.A.T. 8+",
+      "usb_manufacturer": "Mad Catz"
     },
     "RAT Pro X3": {
+      "name": "Mad Catz RAT Pro X3",
       "vid": "0x0738",
       "pid": "0x1713",
       "vendor": "Mad Catz",
       "product": "RAT Pro X3",
-      "description": "Mad Catz R.A.T. Pro X3 Supreme"
+      "description": "Mad Catz R.A.T. Pro X3 Supreme Gaming Mouse",
+      "manufacturer": "Mad Catz",
+      "usb_product": "Mad Catz R.A.T. Pro X3",
+      "usb_manufacturer": "Mad Catz"
     }
   },
   "HP Omen": {
     "Vector": {
+      "name": "HP Omen Vector",
       "vid": "0x03F0",
       "pid": "0x1641",
       "vendor": "HP",
       "product": "Omen Vector",
-      "description": "HP Omen Vector Gaming Mouse"
+      "description": "HP Omen Vector Gaming Mouse",
+      "manufacturer": "HP Inc.",
+      "usb_product": "OMEN by HP Vector",
+      "usb_manufacturer": "HP"
     },
     "Photon": {
+      "name": "HP Omen Photon",
       "vid": "0x03F0",
       "pid": "0x1642",
       "vendor": "HP",
       "product": "Omen Photon",
-      "description": "HP Omen Photon Wireless Mouse"
+      "description": "HP Omen Photon Wireless Mouse",
+      "manufacturer": "HP Inc.",
+      "usb_product": "OMEN by HP Photon Wireless",
+      "usb_manufacturer": "HP"
     }
   },
   "Lenovo Legion": {
     "M500": {
+      "name": "Lenovo Legion M500",
       "vid": "0x17EF",
       "pid": "0x60A0",
       "vendor": "Lenovo",
       "product": "Legion M500",
-      "description": "Lenovo Legion M500 RGB Mouse"
+      "description": "Lenovo Legion M500 RGB Mouse",
+      "manufacturer": "Lenovo",
+      "usb_product": "Lenovo Legion M500 RGB Gaming Mouse",
+      "usb_manufacturer": "Lenovo"
     },
     "M600": {
+      "name": "Lenovo Legion M600",
       "vid": "0x17EF",
       "pid": "0x60A1",
       "vendor": "Lenovo",
       "product": "Legion M600",
-      "description": "Lenovo Legion M600 Wireless Gaming Mouse"
+      "description": "Lenovo Legion M600 Wireless Gaming Mouse",
+      "manufacturer": "Lenovo",
+      "usb_product": "Lenovo Legion M600 Wireless",
+      "usb_manufacturer": "Lenovo"
     }
   },
   "Dell": {
     "MS7421W": {
+      "name": "Dell MS7421W",
       "vid": "0x413C",
       "pid": "0x301A",
       "vendor": "Dell",
       "product": "MS7421W",
-      "description": "Dell MS7421W Rechargeable Wireless Mouse"
+      "description": "Dell MS7421W Rechargeable Wireless Mouse",
+      "manufacturer": "Dell Inc.",
+      "usb_product": "Dell MS7421W Wireless Mouse",
+      "usb_manufacturer": "Dell"
     }
   },
   "AOC": {
     "GM500": {
+      "name": "AOC GM500",
       "vid": "0x2A7A",
       "pid": "0x0001",
       "vendor": "AOC",
       "product": "GM500",
-      "description": "AOC GM500 RGB Gaming Mouse"
+      "description": "AOC GM500 RGB Gaming Mouse",
+      "manufacturer": "AOC",
+      "usb_product": "AOC GM500 RGB Gaming Mouse",
+      "usb_manufacturer": "AOC"
     }
   },
   "Acer Predator": {
     "Cestus 330": {
+      "name": "Acer Predator Cestus 330",
       "vid": "0x1D57",
       "pid": "0xFA60",
       "vendor": "Acer",
       "product": "Cestus 330",
-      "description": "Acer Predator Cestus 330 Gaming Mouse"
+      "description": "Acer Predator Cestus 330 Gaming Mouse",
+      "manufacturer": "Acer",
+      "usb_product": "Acer Predator Cestus 330",
+      "usb_manufacturer": "Acer"
     },
     "Cestus 510": {
+      "name": "Acer Predator Cestus 510",
       "vid": "0x1D57",
       "pid": "0xFA61",
       "vendor": "Acer",
       "product": "Cestus 510",
-      "description": "Acer Predator Cestus 510 RGB Mouse"
+      "description": "Acer Predator Cestus 510 RGB Mouse",
+      "manufacturer": "Acer",
+      "usb_product": "Acer Predator Cestus 510",
+      "usb_manufacturer": "Acer"
+    }
+  },
+  "Ajazz": {
+    "2.4G 8K": {
+      "name": "Ajazz 2.4G 8K",
+      "vid": "0x3151",
+      "pid": "0x402D",
+      "vendor": "Ajazz",
+      "product": "AJAZZ 2.4G 8K",
+      "description": "Ajazz 2.4G 8K Spoof",
+      "manufacturer": "Ajazz",
+      "usb_product": "AJAZZ 2.4G 8K Gaming Mouse",
+      "usb_manufacturer": "Ajazz",
+      "extra_flags": "-DCDC_DISABLED"
     }
   }
 }

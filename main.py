@@ -1,117 +1,23 @@
 import sys
 import os
 import json
+import time
 from datetime import datetime
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QGroupBox, QLabel, QComboBox,
                              QPushButton, QTextEdit, QProgressBar, QFileDialog,
                              QMessageBox, QTabWidget, QLineEdit, QStatusBar,
                              QAction, QGridLayout)
-from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QFont
 from utils.file_manager import FileManager
 from utils.arduino_utils import ArduinoUtils
 from utils.spoof_engine import SpoofEngine
-from utils.serial_checker import SerialChecker, PortDiscovery
-
-
-class SpoofWorker(QThread):
-    progress = pyqtSignal(int)
-    message = pyqtSignal(str)
-    finished = pyqtSignal(bool)
-
-    def __init__(self, config, file_manager, arduino_utils):
-        super().__init__()
-        self.config = config
-        self.file_manager = file_manager
-        self.arduino_utils = arduino_utils
-
-    def run(self):
-        try:
-            self.message.emit("Iniciando processo de spoofing...")
-            self.progress.emit(10)
-
-            backup_file = self.file_manager.backup_boards_file(self.config['arduino_path'])
-            if not backup_file:
-                self.message.emit("Erro: Não foi possível criar backup!")
-                self.finished.emit(False)
-                return
-
-            self.progress.emit(30)
-
-            success = self.file_manager.modify_boards_file(
-                self.config['arduino_path'],
-                self.config['mouse_profile']
-            )
-
-            if not success:
-                self.message.emit("Erro na modificação do boards.txt!")
-                self.finished.emit(False)
-                return
-
-            self.progress.emit(60)
-
-            if self.config.get('upload_sketch', False):
-                mode = self.config.get("firmware_mode", "universal")
-                self.message.emit(f"Fazendo upload do firmware: {mode}")
-                success, stdout, stderr = self.arduino_utils.upload_sketch(
-                    self.config['selected_port'],
-                    self.config['arduino_path'],
-                    mode=mode
-                )
-                if not success:
-                    self.message.emit(f"Erro no upload: {stderr}")
-
-            self.progress.emit(100)
-            self.message.emit("Processo concluído com sucesso!")
-            self.finished.emit(True)
-
-        except Exception as e:
-            self.message.emit(f"Erro durante spoofing: {str(e)}")
-            self.finished.emit(False)
-
-
-class RestoreWorker(QThread):
-    progress = pyqtSignal(int)
-    message = pyqtSignal(str)
-    finished = pyqtSignal(bool)
-
-    def __init__(self, arduino_path, backup_file, file_manager):
-        super().__init__()
-        self.arduino_path = arduino_path
-        self.backup_file = backup_file
-        self.file_manager = file_manager
-
-    def run(self):
-        try:
-            self.message.emit("Iniciando restauração...")
-            self.progress.emit(30)
-
-            success = self.file_manager.restore_backup(
-                self.backup_file,
-                self.arduino_path
-            )
-
-            if not success:
-                self.message.emit("Erro na restauração do backup!")
-                self.finished.emit(False)
-                return
-
-            self.message.emit("Backup restaurado com sucesso!")
-            self.progress.emit(100)
-            self.finished.emit(True)
-
-        except Exception as e:
-            self.message.emit(f"Erro durante restauração: {str(e)}")
-            self.finished.emit(False)
 
 
 class ArduinoSpooferApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.worker = None
-        self.serial_checker = None
-        self.port_discovery = None
         self.file_manager = FileManager()
         self.arduino_utils = ArduinoUtils()
         self.spoof_engine = SpoofEngine()
@@ -125,6 +31,11 @@ class ArduinoSpooferApp(QMainWindow):
             'firmware_mode': 'universal',
             'mouse_profiles': self.spoof_engine.load_profiles()
         }
+
+        self.mouse_profiles = self.config['mouse_profiles']
+        if not self.mouse_profiles:
+            self.mouse_profiles = {"Exemplo": {"Modelo1": {"vid": "0x1234", "pid": "0x5678"}}}
+
         self.init_ui()
         self.load_settings()
 
@@ -214,7 +125,7 @@ class ArduinoSpooferApp(QMainWindow):
 
         mouse_layout.addWidget(QLabel("Marca:"), 0, 0)
         self.brand_combo = QComboBox()
-        self.brand_combo.addItems(self.config['mouse_profiles'].keys())
+        self.brand_combo.addItems(self.mouse_profiles.keys())
         self.brand_combo.currentTextChanged.connect(self.update_models)
         mouse_layout.addWidget(self.brand_combo, 0, 1)
 
@@ -229,7 +140,7 @@ class ArduinoSpooferApp(QMainWindow):
         path_layout = QHBoxLayout(path_group)
 
         self.path_edit = QLineEdit()
-        self.path_edit.setPlaceholderText("Caminho para boards.txt do Arduino...")
+        self.path_edit.setPlaceholderText("Caminho para instalação do Arduino CLI...")
         path_layout.addWidget(self.path_edit)
 
         self.browse_btn = QPushButton("Procurar")
@@ -257,10 +168,6 @@ class ArduinoSpooferApp(QMainWindow):
         self.test_spoof_btn.clicked.connect(self.test_spoof)
         test_layout.addWidget(self.test_spoof_btn)
 
-        self.test_reset_btn = QPushButton("Testar RESET")
-        self.test_reset_btn.clicked.connect(self.test_reset)
-        test_layout.addWidget(self.test_reset_btn)
-
         layout.addLayout(test_layout)
 
         self.progress_bar = QProgressBar()
@@ -275,12 +182,10 @@ class ArduinoSpooferApp(QMainWindow):
 
     def setup_config_tab(self, tab):
         layout = QVBoxLayout(tab)
-
-        # Seleção de firmware
         fw_group = QGroupBox("Firmware")
         fw_layout = QHBoxLayout(fw_group)
         self.fw_combo = QComboBox()
-        self.fw_combo.addItems(["universal", "reset"])
+        self.fw_combo.addItems(["universal"])
         fw_layout.addWidget(QLabel("Selecionar firmware:"))
         fw_layout.addWidget(self.fw_combo)
         layout.addWidget(fw_group)
@@ -291,22 +196,14 @@ class ArduinoSpooferApp(QMainWindow):
         self.port_status_label.setText("Status: Não verificado")
         self.port_status_label.setStyleSheet("color: #ff5252; font-weight: bold;")
 
-        self.port_discovery = PortDiscovery()
-        self.port_discovery.message.connect(self.log_message)
-        self.port_discovery.progress.connect(self.progress_bar.setValue)
-        self.port_discovery.ports_found.connect(self.on_ports_discovered)
-        self.port_discovery.start()
-
-    def on_ports_discovered(self, ports):
-        self.port_combo.clear()
-        for port in ports:
-            display_text = f"{port['device']} - {port['description']}"
-            self.port_combo.addItem(display_text, port['device'])
-
+        ports = self.arduino_utils.list_all_serial_ports()
         if ports:
-            self.log_message(f"{len(ports)} porta(s) Arduino encontrada(s)")
+            for p in ports:
+                label = f"{p['device']} ({p['description']})"
+                self.port_combo.addItem(label, p['device'])
+            self.log_message(f"{len(ports)} porta(s) encontrada(s)")
         else:
-            self.log_message("Nenhuma porta Arduino encontrada")
+            self.log_message("Nenhuma porta encontrada")
 
     def verify_selected_port(self):
         port = self.port_combo.currentData()
@@ -316,31 +213,24 @@ class ArduinoSpooferApp(QMainWindow):
 
         self.port_status_label.setText("Status: Verificando...")
         self.port_status_label.setStyleSheet("color: #ffeb3b; font-weight: bold;")
-        self.verify_btn.setEnabled(False)
 
-        self.serial_checker = SerialChecker(port)
-        self.serial_checker.message.connect(self.log_message)
-        self.serial_checker.progress.connect(self.progress_bar.setValue)
-        self.serial_checker.finished.connect(self.on_verification_finished)
-        self.serial_checker.start()
-
-    def on_verification_finished(self, success, port_name):
-        self.verify_btn.setEnabled(True)
-        if success:
-            self.port_status_label.setText("Status: ✅ Verificado")
+        ok, out, err = self.arduino_utils.upload_sketch(
+            port, self.path_edit.text(), mode="blink"
+        )
+        if ok:
+            self.port_status_label.setText("Status: ✅ Sucesso")
             self.port_status_label.setStyleSheet("color: #4caf50; font-weight: bold;")
-            self.log_message(f"Porta {port_name} verificada com sucesso!")
-            self.config['verified_port'] = port_name
+            self.log_message(f"{port}  ✅ Verificado com Sucesso !!!")
         else:
             self.port_status_label.setText("Status: ❌ Falha")
             self.port_status_label.setStyleSheet("color: #f44336; font-weight: bold;")
-            self.log_message(f"Falha na verificação da porta {port_name}")
+            self.log_message(f"Falha ao enviar blink_test.ino: {err or out}")
 
     def update_models(self):
         self.model_combo.clear()
         brand = self.brand_combo.currentText()
-        if brand in self.config['mouse_profiles']:
-            self.model_combo.addItems(self.config['mouse_profiles'][brand].keys())
+        if brand in self.mouse_profiles:
+            self.model_combo.addItems(self.mouse_profiles[brand].keys())
 
     def browse_arduino_path(self):
         path = QFileDialog.getExistingDirectory(self, "Selecionar Pasta do Arduino")
@@ -354,13 +244,18 @@ class ArduinoSpooferApp(QMainWindow):
         brand = self.brand_combo.currentText()
         model = self.model_combo.currentText()
         mouse_profile = self.spoof_engine.get_profile(brand, model)
-
         if not mouse_profile:
             self.log_message("Perfil de mouse não encontrado!")
             return
 
+        port = self.port_combo.currentData()
+        vid = mouse_profile["vid"]
+        pid = mouse_profile["pid"]
+        product = mouse_profile.get("product", f"{brand} {model}")
+        extra_flags = mouse_profile.get("extra_flags", "")
+
         self.config.update({
-            'selected_port': self.port_combo.currentData(),
+            'selected_port': port,
             'selected_brand': brand,
             'selected_model': model,
             'arduino_path': self.path_edit.text(),
@@ -368,13 +263,38 @@ class ArduinoSpooferApp(QMainWindow):
             'firmware_mode': self.fw_combo.currentText()
         })
 
-        self.worker = SpoofWorker(self.config, self.file_manager, self.arduino_utils)
-        self.worker.progress.connect(self.progress_bar.setValue)
-        self.worker.message.connect(self.log_message)
-        self.worker.finished.connect(self.on_operation_finished)
-        self.worker.start()
+        # 1) Backup boards.txt
+        arduino_path = self.path_edit.text().strip()
+        backup = self.file_manager.backup_boards_file(arduino_path)
+        if backup:
+            self.log_message(f"Backup criado: {backup}")
+        else:
+            self.log_message("⚠️ Não foi possível criar backup do boards.txt")
 
-        self.set_buttons_enabled(False)
+        # 2) Modificar boards.txt
+        ok = self.file_manager.modify_boards_file(arduino_path, {
+            "vid": vid,
+            "pid": pid,
+            "product": product,
+            "extra_flags": extra_flags
+        })
+        if not ok:
+            self.log_message("❌ Falha ao modificar boards.txt")
+            return
+        self.log_message(f"boards.txt modificado para {brand} {model} ({vid}:{pid})")
+
+        # 3) Upload do firmware universal
+        self.log_message("⚡ Enviando firmware universal...")
+        ok, out, err = self.arduino_utils.upload_sketch(
+            port, arduino_path, mode="universal"
+        )
+
+        if not ok:
+            self.log_message(f"❌ Falha ao enviar universal_spoofer.ino: {err or out}")
+            return
+
+        self.log_message("✅ Firmware universal enviado, aguardando reconexão...")
+        self.progress_bar.setValue(100)
 
     def validate_inputs(self):
         if not self.port_combo.currentData():
@@ -386,103 +306,75 @@ class ArduinoSpooferApp(QMainWindow):
         if not self.path_edit.text():
             self.log_message("Selecione o caminho do Arduino!")
             return False
-        if not hasattr(self, 'verified_port') or self.config.get('verified_port') != self.port_combo.currentData():
-            self.log_message("Verifique a porta antes de continuar!")
-            return False
         return True
 
     def log_message(self, message):
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.log_text.append(f"[{timestamp}] {message}")
-        self.status_bar.showMessage(message)
+        self.statusBar().showMessage(message)
 
-    def on_operation_finished(self, success):
-        self.set_buttons_enabled(True)
-        if success:
-            self.log_message("Operação concluída com sucesso!")
-        else:
-            self.log_message("Operação falhou!")
-
-    def set_buttons_enabled(self, enabled):
-        self.spoof_btn.setEnabled(enabled)
-        self.refresh_ports_btn.setEnabled(enabled)
-        self.browse_btn.setEnabled(enabled)
-        self.verify_btn.setEnabled(enabled)
-        self.test_status_btn.setEnabled(enabled)
-        self.test_spoof_btn.setEnabled(enabled)
-        self.test_reset_btn.setEnabled(enabled)
-
-    def load_settings(self):
-        try:
-            if os.path.exists('config.json'):
-                with open('config.json', 'r') as f:
-                    saved_config = json.load(f)
-                    self.config.update(saved_config)
-                    self.path_edit.setText(self.config.get('arduino_path', ''))
-        except:
-            pass
-
-    def save_config(self):
-        try:
-            with open('config.json', 'w') as f:
-                json.dump(self.config, f)
-            self.log_message("Configurações salvas!")
-        except Exception as e:
-            self.log_message(f"Erro ao salvar: {str(e)}")
-
-    def load_config(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Carregar Configuração", "", "JSON Files (*.json)")
-        if path:
-            try:
-                with open(path, 'r') as f:
-                    self.config.update(json.load(f))
-                    self.path_edit.setText(self.config.get('arduino_path', ''))
-                self.log_message("Configuração carregada!")
-            except Exception as e:
-                self.log_message(f"Erro ao carregar: {str(e)}")
-
-    def show_about(self):
-        QMessageBox.about(self, "Sobre", "Arduino Mouse Spoofer\n\nSuporte para firmware universal e reset.")
-
-    # ---- Testes diretos ----
     def test_status(self):
         port = self.port_combo.currentData()
         if not port:
             self.log_message("Nenhuma porta selecionada para teste")
             return
-        self.spoof_engine.port = port
-        if not self.spoof_engine.connect():
-            self.log_message("Falha ao conectar ao Arduino")
-            return
-        resp = self.spoof_engine.get_status()
+        resp = self.spoof_engine.get_status(port)
         self.log_message(f"STATUS: {resp}")
-        self.spoof_engine.disconnect()
 
     def test_spoof(self):
         port = self.port_combo.currentData()
         if not port:
             self.log_message("Nenhuma porta selecionada para teste")
             return
-        self.spoof_engine.port = port
-        if not self.spoof_engine.connect():
-            self.log_message("Falha ao conectar ao Arduino")
+        brand = self.brand_combo.currentText()
+        model = self.model_combo.currentText()
+        profile = self.spoof_engine.get_profile(brand, model)
+        if not profile:
+            self.log_message("Perfil de mouse não encontrado")
             return
-        resp = self.spoof_engine.spoof()
+        vid = profile["vid"]
+        pid = profile["pid"]
+        resp = self.spoof_engine.spoof(port, vid, pid)
         self.log_message(f"SPOOF: {resp}")
-        self.spoof_engine.disconnect()
 
-    def test_reset(self):
-        port = self.port_combo.currentData()
-        if not port:
-            self.log_message("Nenhuma porta selecionada para teste")
-            return
-        self.spoof_engine.port = port
-        if not self.spoof_engine.connect():
-            self.log_message("Falha ao conectar ao Arduino")
-            return
-        resp = self.spoof_engine.reset()
-        self.log_message(f"RESET: {resp}")
-        self.spoof_engine.disconnect()
+    # ------------------ Configuração ------------------
+    def load_settings(self):
+        try:
+            if os.path.exists('config.json'):
+                with open('config.json', 'r', encoding='utf-8') as f:
+                    saved_config = json.load(f)
+                    self.config.update(saved_config)
+                    self.path_edit.setText(self.config.get('arduino_path', ''))
+        except Exception as e:
+            self.log_message(f"Erro ao carregar config inicial: {e}")
+
+    def save_config(self):
+        try:
+            with open('config.json', 'w', encoding='utf-8') as f:
+                json.dump(self.config, f, indent=4)
+            self.log_message("Configurações salvas em config.json!")
+        except Exception as e:
+            self.log_message(f"Erro ao salvar configuração: {e}")
+
+    def load_config(self):
+        try:
+            if os.path.exists('config.json'):
+                with open('config.json', 'r', encoding='utf-8') as f:
+                    saved = json.load(f)
+                    self.config.update(saved)
+                    self.path_edit.setText(self.config.get('arduino_path', ''))
+                    brand = self.config.get('selected_brand', '')
+                    model = self.config.get('selected_model', '')
+                    if brand in self.mouse_profiles:
+                        self.brand_combo.setCurrentText(brand)
+                        if model in self.mouse_profiles[brand]:
+                            self.model_combo.setCurrentText(model)
+                self.log_message("Configuração carregada de config.json!")
+        except Exception as e:
+            self.log_message(f"Erro ao carregar configuração: {e}")
+
+    def show_about(self):
+        QMessageBox.about(self, "Sobre", "Arduino Mouse Spoofer\n\nVerificação via blink_test.ino")
 
 
 def main():
