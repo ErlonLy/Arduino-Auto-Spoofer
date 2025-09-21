@@ -16,7 +16,7 @@ python -m venv .venv
 ### 2. Ativar ambiente virtual
 - **Windows (PowerShell):**
   ```bash
-  .venv\Scripts\Activate.ps1
+  .venv\Scripts\Activate.ps1 ( ou entra na pasta .venv\Scripts\ arrasta e solta no terminal do vscode )
   ```
 - **Windows (CMD):**
   ```bash
@@ -83,7 +83,7 @@ Arduino-Auto-Spoofer/
 - Envia firmware universal de spoof para o Arduino.  
 - Permite restaurar `boards.txt` original a partir de backup.  
 - Detecta rastros de spoof no arquivo do Arduino.  
-- Interface customizada em **PyQt5** (tema vermelho/preto).  
+- Força o reconhecimento de fabricante dos mouses
 
 ---
 
