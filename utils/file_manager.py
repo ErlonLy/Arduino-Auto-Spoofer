@@ -8,34 +8,34 @@ class FileManager:
     def __init__(self):
         self.backup_dir = "backups"
         os.makedirs(self.backup_dir, exist_ok=True)
+        # Template mínimo do boards.txt
+        self.template_file = os.path.join("boards_templates", "boards.txt")
 
     def _find_boards_file(self, arduino_path):
         """
-        Procura o boards.txt dentro do caminho fornecido (recursivamente).
-        Exemplo válido:
-        .../Arduino15/packages/arduino/hardware/avr/1.8.6/boards.txt
+        Localiza boards.txt dentro do Arduino AVR
         """
-        # Primeiro procura no caminho específico do Arduino AVR
         possible_paths = [
             os.path.join(arduino_path, "packages", "arduino", "hardware", "avr"),
             os.path.join(arduino_path, "hardware", "arduino", "avr"),
-            arduino_path  # Busca recursivamente como fallback
+            arduino_path
         ]
-        
         for base_path in possible_paths:
             if os.path.exists(base_path):
-                for root, dirs, files in os.walk(base_path):
+                for root, _, files in os.walk(base_path):
                     if "boards.txt" in files:
                         return os.path.join(root, "boards.txt")
         return None
 
     def backup_boards_file(self, arduino_path):
+        """
+        Copia o boards.txt original para a pasta de backups
+        """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
                 print("⚠️ boards.txt não encontrado para backup")
                 return None
-
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_file = os.path.join(self.backup_dir, f"boards_{timestamp}.txt")
             shutil.copy2(boards_path, backup_file)
@@ -46,6 +46,9 @@ class FileManager:
             return None
 
     def restore_backup(self, backup_file, arduino_path):
+        """
+        Restaura um backup anterior
+        """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
@@ -58,29 +61,10 @@ class FileManager:
             print(f"❌ Erro na restauração: {e}")
             return False
 
-    def get_latest_backup(self):
-        try:
-            backups = sorted(
-                [
-                    os.path.join(self.backup_dir, f)
-                    for f in os.listdir(self.backup_dir)
-                    if f.endswith(".txt") and "boards_" in f
-                ],
-                key=os.path.getmtime,
-                reverse=True,
-            )
-            return backups[0] if backups else None
-        except Exception as e:
-            print(f"❌ Erro ao buscar backups: {e}")
-            return None
-
     def modify_boards_file(self, arduino_path, profile):
         """
-        Atualiza boards.txt do Leonardo para emular outro dispositivo (spoof).
-        - Substitui build.vid / build.pid / build.usb_product / build.usb_manufacturer
-        - Substitui todas as entradas leonardo.vid.N e leonardo.pid.N
-        - Atualiza também upload_port.*
-        - Modifica o nome da placa
+        Substitui o boards.txt do usuário pelo template mínimo
+        e injeta apenas as extra_flags.
         """
         try:
             boards_path = self._find_boards_file(arduino_path)
@@ -88,152 +72,161 @@ class FileManager:
                 print("⚠️ boards.txt não encontrado para modificação")
                 return False
 
-            print(f"📝 Modificando boards.txt em: {boards_path}")
-            
-            with open(boards_path, "r", encoding="utf-8", errors="ignore") as f:
-                lines = f.readlines()
+            if not os.path.exists(self.template_file):
+                print(f"⚠️ Template não encontrado: {self.template_file}")
+                return False
 
-            prefix = "leonardo"
-            new_lines = []
-            in_leonardo_block = False
-            touched = {
-                "name": False, 
-                "vid": False, 
-                "pid": False, 
-                "product": False,
-                "manufacturer": False
-            }
+            # Lê template base
+            with open(self.template_file, "r", encoding="utf-8") as f:
+                content = f.read()
 
-            for line in lines:
-                stripped_line = line.strip()
-                
-                # Detecta início do bloco leonardo
-                if line.startswith("leonardo.name="):
-                    in_leonardo_block = True
-                    # Atualiza o nome da placa
-                    new_lines.append(f"leonardo.name={profile.get('name', 'Logitech G502 HERO')}\n")
-                    touched["name"] = True
-                    continue
-                
-                # Detecta fim do bloco leonardo
-                if in_leonardo_block and stripped_line == "":
-                    in_leonardo_block = False
-                
-                # Processa linhas dentro do bloco leonardo
-                if in_leonardo_block:
-                    # Modifica VID e PID em todas as variantes
-                    if line.startswith("leonardo.vid."):
-                        new_lines.append(f"{line.split('=')[0]}={profile['vid']}\n")
-                        touched["vid"] = True
-                        continue
-                    elif line.startswith("leonardo.pid."):
-                        new_lines.append(f"{line.split('=')[0]}={profile['pid']}\n")
-                        touched["pid"] = True
-                        continue
-                    elif line.startswith("leonardo.upload_port."):
-                        if ".vid=" in line:
-                            new_lines.append(f"{line.split('=')[0]}={profile['vid']}\n")
-                        elif ".pid=" in line:
-                            new_lines.append(f"{line.split('=')[0]}={profile['pid']}\n")
-                        else:
-                            new_lines.append(line)
-                        continue
-                    elif line.startswith(f"{prefix}.build.vid"):
-                        new_lines.append(f"{prefix}.build.vid={profile['vid']}\n")
-                        touched["vid"] = True
-                        continue
-                    elif line.startswith(f"{prefix}.build.pid"):
-                        new_lines.append(f"{prefix}.build.pid={profile['pid']}\n")
-                        touched["pid"] = True
-                        continue
-                    elif line.startswith(f"{prefix}.build.usb_product"):
-                        new_lines.append(f'{prefix}.build.usb_product="{profile["product"]}"\n')
-                        touched["product"] = True
-                        continue
-                    elif line.startswith(f"{prefix}.build.usb_manufacturer"):
-                        new_lines.append(f'{prefix}.build.usb_manufacturer="{profile.get("manufacturer", "Logitech")}"\n')
-                        touched["manufacturer"] = True
-                        continue
-                    elif line.startswith(f"{prefix}.build.extra_flags"):
-                        if "extra_flags" in profile and profile["extra_flags"]:
-                            new_lines.append(
-                                f"{prefix}.build.extra_flags={{build.usb_flags}} {profile['extra_flags']}\n"
-                            )
-                        else:
-                            new_lines.append(f"{prefix}.build.extra_flags={{build.usb_flags}}\n")
-                        continue
-                
-                new_lines.append(line)
+            # Monta extra_flags
+            flags = []
+            if profile.get("force_vid_pid", False):
+                flags.append(f"-DUSB_VID={profile['vid']} -DUSB_PID={profile['pid']}")
+            if profile.get("force_product_manufacturer", False):
+                usb_product = profile.get("usb_product", profile.get("product", "Arduino Leonardo"))
+                usb_manufacturer = profile.get("usb_manufacturer", profile.get("manufacturer", "Arduino"))
+                # Mantém espaços, mas envolve em aspas para string literal válida
+                flags.append(f'-DUSB_PRODUCT="{usb_product}"')
+                flags.append(f'-DUSB_MANUFACTURER="{usb_manufacturer}"')
 
-            # Adiciona linhas que não existiam no arquivo original
-            if not touched["name"]:
-                new_lines.append(f"leonardo.name={profile.get('name', 'Logitech G502 HERO')}\n")
-            
-            if not touched["vid"]:
-                new_lines.append(f"{prefix}.build.vid={profile['vid']}\n")
-            
-            if not touched["pid"]:
-                new_lines.append(f"{prefix}.build.pid={profile['pid']}\n")
-            
-            if not touched["product"]:
-                new_lines.append(f'{prefix}.build.usb_product="{profile["product"]}"\n')
-            
-            if not touched["manufacturer"]:
-                new_lines.append(f'{prefix}.build.usb_manufacturer="{profile.get("manufacturer", "Logitech")}"\n')
+            extra_flags = " ".join(flags)
 
-            # Escreve o arquivo modificado
-            with open(boards_path, "w", encoding="utf-8", errors="ignore") as f:
-                f.writelines(new_lines)
+            # Substitui placeholder {EXTRA_FLAGS}
+            content = content.replace("{EXTRA_FLAGS}", extra_flags)
 
-            # Limpa o cache do arduino-cli
+            # Backup do boards.txt atual
+            self.backup_boards_file(arduino_path)
+
+            # Escreve no boards.txt real
+            with open(boards_path, "w", encoding="utf-8") as f:
+                f.write(content)
+
             self._clean_arduino_cache()
-            
-            print("✅ boards.txt modificado com sucesso!")
+            print("✅ boards.txt atualizado com sucesso (via template mínimo)")
             return True
-            
         except Exception as e:
-            print(f"❌ Erro ao modificar boards.txt: {e}")
+            print(f"❌ Erro detalhado ao modificar boards.txt: {str(e)}")
+            import traceback
+            traceback.print_exc()
             return False
 
     def _clean_arduino_cache(self):
-        """Limpa o cache do Arduino CLI para garantir que as mudanças tenham efeito"""
+        """
+        Limpa cache do Arduino CLI
+        """
         try:
             cli_path = os.path.join("utils", "arduino-cli.exe")
-            cli_path = os.path.abspath(cli_path)
             if os.path.exists(cli_path):
-                result = subprocess.run([cli_path, "cache", "clean"], 
-                                      capture_output=True, text=True, timeout=30)
-                if result.returncode == 0:
-                    print("✅ Cache do arduino-cli limpo")
-                else:
-                    print(f"⚠️ Cache clean retornou código {result.returncode}")
-            else:
-                print("⚠️ arduino-cli.exe não encontrado para limpar cache")
-        except subprocess.TimeoutExpired:
-            print("⚠️ Timeout ao limpar cache do arduino-cli")
+                subprocess.run([cli_path, "cache", "clean"], timeout=30)
+
+            temp_dirs = [
+                os.path.join(os.environ.get('TEMP', ''), 'arduino', 'sketches'),
+                os.path.join(os.environ.get('TEMP', ''), 'arduino', 'cores'),
+                os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Temp', 'arduino', 'sketches'),
+                os.path.join(os.environ.get('LOCALAPPDATA', ''), 'Temp', 'arduino', 'cores')
+            ]
+
+            for temp_dir in temp_dirs:
+                if os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                    print(f"🧹 Diretório temporário limpo: {temp_dir}")
+
         except Exception as e:
             print(f"⚠️ Erro ao limpar cache: {e}")
 
     def verify_modification(self, arduino_path, expected_vid, expected_pid):
         """
-        Verifica se as modificações no boards.txt foram aplicadas corretamente
+        Confere se boards.txt foi modificado corretamente
         """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
                 return False, "Arquivo boards.txt não encontrado"
-            
+
             with open(boards_path, "r", encoding="utf-8") as f:
                 content = f.read()
-            
-            # Verifica se os valores esperados estão presentes
-            vid_correct = f"build.vid={expected_vid}" in content
-            pid_correct = f"build.pid={expected_pid}" in content
-            vid_entries = content.count(f"vid={expected_vid}")
-            pid_entries = content.count(f"pid={expected_pid}")
-            
-            return (vid_correct and pid_correct, 
-                   f"VID: {vid_correct} ({vid_entries} entradas), PID: {pid_correct} ({pid_entries} entradas)")
-                   
+
+            vid_ok = f"-DUSB_VID={expected_vid}" in content
+            pid_ok = f"-DUSB_PID={expected_pid}" in content
+            return (vid_ok and pid_ok, f"VID OK: {vid_ok}, PID OK: {pid_ok}")
         except Exception as e:
             return False, f"Erro na verificação: {str(e)}"
+
+    # ---------------- NOVA FUNÇÃO ----------------
+    def check_spoof_trace(self, arduino_path):
+        """
+        Verifica se o bloco do Leonardo no boards.txt está idêntico ao padrão de fábrica.
+        Se houver qualquer diferença ou flags extras → rastro de spoofer detectado.
+        """
+        factory_block = {
+            "leonardo.name": "Arduino Leonardo",
+            "leonardo.vid.0": "0x2341",
+            "leonardo.pid.0": "0x0036",
+            "leonardo.vid.1": "0x2341",
+            "leonardo.pid.1": "0x8036",
+            "leonardo.vid.2": "0x2A03",
+            "leonardo.pid.2": "0x0036",
+            "leonardo.vid.3": "0x2A03",
+            "leonardo.pid.3": "0x8036",
+            "leonardo.upload_port.0.vid": "0x2341",
+            "leonardo.upload_port.0.pid": "0x0036",
+            "leonardo.upload_port.1.vid": "0x2341",
+            "leonardo.upload_port.1.pid": "0x8036",
+            "leonardo.upload_port.2.vid": "0x2A03",
+            "leonardo.upload_port.2.pid": "0x0036",
+            "leonardo.upload_port.3.vid": "0x2A03",
+            "leonardo.upload_port.3.pid": "0x8036",
+            "leonardo.upload_port.4.board": "leonardo",
+            "leonardo.upload.tool": "avrdude",
+            "leonardo.upload.tool.default": "avrdude",
+            "leonardo.upload.tool.network": "arduino_ota",
+            "leonardo.upload.protocol": "avr109",
+            "leonardo.upload.maximum_size": "28672",
+            "leonardo.upload.maximum_data_size": "2560",
+            "leonardo.upload.speed": "57600",
+            "leonardo.upload.disable_flushing": "true",
+            "leonardo.upload.use_1200bps_touch": "true",
+            "leonardo.upload.wait_for_upload_port": "true",
+            "leonardo.bootloader.tool": "avrdude",
+            "leonardo.bootloader.tool.default": "avrdude",
+            "leonardo.bootloader.low_fuses": "0xff",
+            "leonardo.bootloader.high_fuses": "0xd8",
+            "leonardo.bootloader.extended_fuses": "0xcb",
+            "leonardo.bootloader.file": "caterina/Caterina-Leonardo.hex",
+            "leonardo.bootloader.unlock_bits": "0x3F",
+            "leonardo.bootloader.lock_bits": "0x2F",
+            "leonardo.build.mcu": "atmega32u4",
+            "leonardo.build.f_cpu": "16000000L",
+            "leonardo.build.vid": "0x2341",
+            "leonardo.build.pid": "0x8036",
+            "leonardo.build.usb_product": "\"Arduino Leonardo\"",
+            "leonardo.build.board": "AVR_LEONARDO",
+            "leonardo.build.core": "arduino",
+            "leonardo.build.variant": "leonardo",
+            "leonardo.build.extra_flags": "{build.usb_flags}"
+        }
+
+        boards_path = self._find_boards_file(arduino_path)
+        if not boards_path or not os.path.exists(boards_path):
+            return False, "boards.txt não encontrado"
+
+        with open(boards_path, "r", encoding="utf-8") as f:
+            lines = [line.strip() for line in f if line.strip().startswith("leonardo.")]
+
+        for line in lines:
+            if "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key, value = key.strip(), value.strip()
+            if key not in factory_block:
+                return True, f"⚠️ Rastro detectado: chave extra '{key}'"
+            if key == "leonardo.build.extra_flags":
+                if value != "{build.usb_flags}":
+                    return True, f"⚠️ Rastro detectado: extra_flags adulterado → {value}"
+            elif value != factory_block[key]:
+                return True, f"⚠️ Rastro detectado: {key} esperado '{factory_block[key]}', encontrado '{value}'"
+
+        return False, "✅ boards.txt está no padrão original"
+

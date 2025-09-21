@@ -14,7 +14,7 @@ yun.pid.1=0x8041
 yun.vid.2=0x2A03
 yun.pid.2=0x0041
 yun.vid.3=0x2A03
-yun.pid.3=0x8041F
+yun.pid.3=0x8041
 yun.upload_port.0.vid=0x2341
 yun.upload_port.0.pid=0x0041
 yun.upload_port.1.vid=0x2341
@@ -380,20 +380,20 @@ megaADK.build.variant=mega
 
 leonardo.name=Arduino Leonardo
 leonardo.vid.0=0x2341
-leonardo.pid.0=0x8036
+leonardo.pid.0=0x0036
 leonardo.vid.1=0x2341
 leonardo.pid.1=0x8036
-leonardo.vid.2=0x2341
-leonardo.pid.2=0x8036
-leonardo.vid.3=0x2341
+leonardo.vid.2=0x2A03
+leonardo.pid.2=0x0036
+leonardo.vid.3=0x2A03
 leonardo.pid.3=0x8036
 leonardo.upload_port.0.vid=0x2341
-leonardo.upload_port.0.pid=0x8036
+leonardo.upload_port.0.pid=0x0036
 leonardo.upload_port.1.vid=0x2341
 leonardo.upload_port.1.pid=0x8036
-leonardo.upload_port.2.vid=0x2341
-leonardo.upload_port.2.pid=0x8036
-leonardo.upload_port.3.vid=0x2341
+leonardo.upload_port.2.vid=0x2A03
+leonardo.upload_port.2.pid=0x0036
+leonardo.upload_port.3.vid=0x2A03
 leonardo.upload_port.3.pid=0x8036
 leonardo.upload_port.4.board=leonardo
 
@@ -425,7 +425,7 @@ leonardo.build.usb_product="Arduino Leonardo"
 leonardo.build.board=AVR_LEONARDO
 leonardo.build.core=arduino
 leonardo.build.variant=leonardo
-leonardo.build.extra_flags={build.usb_flags}
+leonardo.build.extra_flags={build.usb_flags} {EXTRA_FLAGS}
 
 ##############################################################
 
@@ -1310,18 +1310,3 @@ unowifi.build.esp_ch_uart_br=19200
 unowifi.build.extra_flags=-DESP_CH_UART -DESP_CH_UART_BR={build.esp_ch_uart_br}
 
 ##############################################################
-leonardo.build.vid=0x046D
-leonardo.build.pid=0xC087
-leonardo.build.usb_product="G703"
-leonardo.build.vid=0x2341
-leonardo.build.pid=0x8036
-leonardo.build.usb_product="Arduino Leonardo"
-leonardo.build.vid=0x2341
-leonardo.build.pid=0x8036
-leonardo.build.usb_product="Arduino Leonardo"
-leonardo.build.vid=0x046D
-leonardo.build.pid=0xC08B
-leonardo.build.usb_product="G502 HERO"
-leonardo.build.vid=0x2341
-leonardo.build.pid=0x8036
-leonardo.build.usb_product="Arduino Leonardo"

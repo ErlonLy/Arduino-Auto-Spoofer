@@ -1,36 +1,53 @@
 #include <EEPROM.h>
 #include <Mouse.h>
 
-// Estrutura para armazenar configuração na EEPROM
+// Estrutura de configuração persistida
 struct Config {
   uint16_t vid;
   uint16_t pid;
   char product_name[32];
+  char manufacturer[32];
   bool configured;
 };
 
 Config config;
 
+// ---------- Defaults vindos do boards.txt ----------
+#ifndef USB_VID
+#define USB_VID 0x2341
+#endif
+
+#ifndef USB_PID
+#define USB_PID 0x8036
+#endif
+
+#ifndef USB_PRODUCT
+#define USB_PRODUCT "Arduino Leonardo"
+#endif
+
+#ifndef USB_MANUFACTURER
+#define USB_MANUFACTURER "Arduino"
+#endif
+// ---------------------------------------------------
+
 void setup() {
-  // Inicializa comunicação serial
   Serial.begin(115200);
   while (!Serial) { delay(10); }
-  
+
   // Lê configuração da EEPROM
   EEPROM.get(0, config);
-  
-  // Se não está configurado, usa valores padrão do Arduino Leonardo
+
   if (!config.configured) {
-    config.vid = 0x2341;
-    config.pid = 0x8036;
-    strcpy(config.product_name, "Arduino Leonardo");
+    config.vid = USB_VID;
+    config.pid = USB_PID;
+    strncpy(config.product_name, USB_PRODUCT, sizeof(config.product_name));
+    strncpy(config.manufacturer, USB_MANUFACTURER, sizeof(config.manufacturer));
     config.configured = true;
     EEPROM.put(0, config);
   }
-  
-  // Inicializa a emulação de mouse HID :cite[1]:cite[8]
+
   Mouse.begin();
-  
+
   Serial.println("UNIVERSAL_SPOOFER_READY");
   printStatus();
 }
@@ -39,7 +56,7 @@ void loop() {
   if (Serial.available()) {
     String command = Serial.readStringUntil('\n');
     command.trim();
-    
+
     if (command == "STATUS") {
       printStatus();
     }
@@ -53,8 +70,6 @@ void loop() {
       EEPROM.put(0, config);
       Serial.println("CONFIG_SAVED");
       printStatus();
-      
-      // Reinicia para aplicar as mudanças
       Serial.println("Reiniciando para aplicar configuração...");
       delay(1000);
       setup();
@@ -67,8 +82,8 @@ void loop() {
       Serial.println("Comandos disponíveis: STATUS, SPOOF, RESET, SAVE, TEST_MOUSE");
     }
   }
-  
-  // Mantém a emulação HID ativa com movimento mínimo :cite[8]
+
+  // Mantém HID ativo
   static unsigned long lastMove = 0;
   if (millis() - lastMove > 5000) {
     Mouse.move(1, 0, 0);
@@ -76,7 +91,7 @@ void loop() {
     Mouse.move(-1, 0, 0);
     lastMove = millis();
   }
-  
+
   delay(50);
 }
 
@@ -86,158 +101,97 @@ void printStatus() {
   Serial.print(",PID=0x");
   Serial.print(config.pid, HEX);
   Serial.print(",PRODUCT=");
-  Serial.println(config.product_name);
-  
-  // CORREÇÃO: Removida a verificação Mouse.isReady() que não existe
-  // Em vez disso, verificamos se o mouse está inicializado de outra forma
-  Serial.print("HID_ACTIVE:");
-  Serial.println("YES"); // Assumimos que está ativo após Mouse.begin()
+  Serial.print(config.product_name);
+  Serial.print(",MANUFACTURER=");
+  Serial.println(config.manufacturer);
+  Serial.println("HID_ACTIVE:YES");
 }
 
 void handleSpoofCommand(String command) {
-  // Formato: SPOOF VID PID "Product Name"
+  // Formato: SPOOF VID PID "Product" "Manufacturer"
   int firstSpace = command.indexOf(' ');
   if (firstSpace <= 0) {
     Serial.println("ERROR:INVALID_SPOOF_FORMAT");
-    Serial.println("Use: SPOOF VID PID \"Product Name\"");
-    Serial.println("Ex: SPOOF 0x046D 0xC08B \"Logitech G502 HERO\"");
     return;
   }
-  
-  String remaining = command.substring(firstSpace + 1);
-  remaining.trim();
-  
-  // Encontra o próximo espaço (separador VID/PID)
-  int secondSpace = remaining.indexOf(' ');
+
+  String args = command.substring(firstSpace + 1);
+  args.trim();
+  int secondSpace = args.indexOf(' ');
   if (secondSpace <= 0) {
     Serial.println("ERROR:INVALID_SPOOF_FORMAT");
-    Serial.println("Use: SPOOF VID PID \"Product Name\"");
     return;
   }
-  
-  String vidStr = remaining.substring(0, secondSpace);
-  String pidAndProduct = remaining.substring(secondSpace + 1);
-  pidAndProduct.trim();
-  
-  // Encontra o próximo espaço ou aspas
-  int thirdSpace = pidAndProduct.indexOf(' ');
-  int quotePos = pidAndProduct.indexOf('"');
-  
-  String pidStr;
-  String product;
-  
-  if (quotePos >= 0) {
-    // Se tem aspas, extrai PID antes das aspas e produto entre aspas
-    pidStr = pidAndProduct.substring(0, quotePos);
-    pidStr.trim();
-    
-    int endQuote = pidAndProduct.indexOf('"', quotePos + 1);
-    if (endQuote > quotePos) {
-      product = pidAndProduct.substring(quotePos + 1, endQuote);
-    } else {
-      product = pidAndProduct.substring(quotePos + 1);
+
+  String vidStr = args.substring(0, secondSpace);
+  String rest = args.substring(secondSpace + 1);
+  rest.trim();
+
+  int thirdSpace = rest.indexOf(' ');
+  if (thirdSpace <= 0) {
+    Serial.println("ERROR:INVALID_SPOOF_FORMAT");
+    return;
+  }
+
+  String pidStr = rest.substring(0, thirdSpace);
+  String remaining = rest.substring(thirdSpace + 1);
+  remaining.trim();
+
+  // Produto e fabricante em aspas
+  String product, manufacturer;
+  int firstQuote = remaining.indexOf('"');
+  if (firstQuote >= 0) {
+    int secondQuote = remaining.indexOf('"', firstQuote + 1);
+    if (secondQuote > firstQuote) {
+      product = remaining.substring(firstQuote + 1, secondQuote);
+      int nextQuote = remaining.indexOf('"', secondQuote + 1);
+      if (nextQuote >= 0) {
+        int lastQuote = remaining.indexOf('"', nextQuote + 1);
+        if (lastQuote > nextQuote) {
+          manufacturer = remaining.substring(nextQuote + 1, lastQuote);
+        }
+      }
     }
-  } else if (thirdSpace > 0) {
-    // Se não tem aspas, mas tem espaço
-    pidStr = pidAndProduct.substring(0, thirdSpace);
-    product = pidAndProduct.substring(thirdSpace + 1);
-    product.trim();
-  } else {
-    // Apenas PID, sem produto
-    pidStr = pidAndProduct;
-    product = "Custom HID Device";
   }
-  
-  // Remove possíveis prefixos 0x ou #
-  if (vidStr.startsWith("0x") || vidStr.startsWith("0X")) {
-    vidStr = vidStr.substring(2);
-  } else if (vidStr.startsWith("#")) {
-    vidStr = vidStr.substring(1);
-  }
-  
-  if (pidStr.startsWith("0x") || pidStr.startsWith("0X")) {
-    pidStr = pidStr.substring(2);
-  } else if (pidStr.startsWith("#")) {
-    pidStr = pidStr.substring(1);
-  }
-  
-  // Converte para números
+
+  // Remove prefixos
+  if (vidStr.startsWith("0x") || vidStr.startsWith("0X")) vidStr = vidStr.substring(2);
+  if (pidStr.startsWith("0x") || pidStr.startsWith("0X")) pidStr = pidStr.substring(2);
+
   char *endptr;
   unsigned long vidLong = strtoul(vidStr.c_str(), &endptr, 16);
-  if (*endptr != '\0' || vidLong > 0xFFFF) {
-    Serial.println("ERROR:INVALID_VID");
-    Serial.print("VID fornecido: ");
-    Serial.println(vidStr);
-    return;
-  }
-  
+  if (*endptr != '\0') { Serial.println("ERROR:INVALID_VID"); return; }
   unsigned long pidLong = strtoul(pidStr.c_str(), &endptr, 16);
-  if (*endptr != '\0' || pidLong > 0xFFFF) {
-    Serial.println("ERROR:INVALID_PID");
-    Serial.print("PID fornecido: ");
-    Serial.println(pidStr);
-    return;
-  }
-  
-  // Atualiza configuração
+  if (*endptr != '\0') { Serial.println("ERROR:INVALID_PID"); return; }
+
   config.vid = (uint16_t)vidLong;
   config.pid = (uint16_t)pidLong;
   product.toCharArray(config.product_name, sizeof(config.product_name));
-  
+  manufacturer.toCharArray(config.manufacturer, sizeof(config.manufacturer));
+
   Serial.println("SPOOF_SUCCESS");
-  Serial.print("Nova configuração - VID: 0x");
-  Serial.print(config.vid, HEX);
-  Serial.print(", PID: 0x");
-  Serial.print(config.pid, HEX);
-  Serial.print(", Product: ");
-  Serial.println(config.product_name);
+  printStatus();
   Serial.println("Execute SAVE para persistir e reiniciar");
 }
 
 void resetToDefault() {
-  config.vid = 0x2341;
-  config.pid = 0x8036;
-  strcpy(config.product_name, "Arduino Leonardo");
+  config.vid = USB_VID;
+  config.pid = USB_PID;
+  strncpy(config.product_name, USB_PRODUCT, sizeof(config.product_name));
+  strncpy(config.manufacturer, USB_MANUFACTURER, sizeof(config.manufacturer));
   config.configured = true;
   EEPROM.put(0, config);
-  
+
   Serial.println("RESET_SUCCESS");
-  Serial.println("Restaurado para padrão Arduino Leonardo");
-  Serial.println("Execute SAVE para persistir e reiniciar");
+  printStatus();
 }
 
 void testMouseFunctions() {
-  Serial.println("TEST_MOUSE:Iniciando teste de funções HID...");
-  
-  // Teste de movimento :cite[1]:cite[8]
-  Serial.println("TEST_MOUSE:Movendo para direita");
-  Mouse.move(10, 0, 0);
-  delay(500);
-  
-  Serial.println("TEST_MOUSE:Movendo para esquerda");
-  Mouse.move(-10, 0, 0);
-  delay(500);
-  
-  Serial.println("TEST_MOUSE:Movendo para baixo");
-  Mouse.move(0, 10, 0);
-  delay(500);
-  
-  Serial.println("TEST_MOUSE:Movendo para cima");
-  Mouse.move(0, -10, 0);
-  delay(500);
-  
-  // Teste de cliques :cite[1]:cite[8]
-  Serial.println("TEST_MOUSE:Clique esquerdo");
-  Mouse.click(MOUSE_LEFT);
-  delay(300);
-  
-  Serial.println("TEST_MOUSE:Clique direito");
-  Mouse.click(MOUSE_RIGHT);
-  delay(300);
-  
-  Serial.println("TEST_MOUSE:Clique medio");
-  Mouse.click(MOUSE_MIDDLE);
-  delay(300);
-  
-  Serial.println("TEST_MOUSE:Teste concluído");
+  Serial.println("TEST_MOUSE:Movimento e cliques...");
+  Mouse.move(10, 0, 0); delay(500);
+  Mouse.move(-10, 0, 0); delay(500);
+  Mouse.click(MOUSE_LEFT); delay(300);
+  Mouse.click(MOUSE_RIGHT); delay(300);
+  Mouse.click(MOUSE_MIDDLE); delay(300);
+  Serial.println("TEST_MOUSE:Concluído");
 }
