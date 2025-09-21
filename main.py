@@ -243,13 +243,19 @@ class ArduinoSpooferApp(QMainWindow):
     def setup_config_tab(self, tab):
         layout = QGridLayout(tab)
 
+    
         fw_group = QGroupBox("Firmware")
         fw_layout = QVBoxLayout(fw_group)
-        self.fw_combo = QComboBox()
-        self.fw_combo.addItems(["universal"])
-        fw_layout.addWidget(QLabel("Selecionar firmware:"))
-        fw_layout.addWidget(self.fw_combo)
 
+        fw_label = QLabel("Selecionar firmware:")
+        fw_label.setAlignment(Qt.AlignCenter)
+        fw_layout.addWidget(fw_label)
+
+        self.fw_combo = QComboBox()
+        self.fw_combo.addItems(["universal", "blink_test"])
+        self.fw_combo.setFixedWidth(250)  
+        fw_layout.addWidget(self.fw_combo, alignment=Qt.AlignCenter)
+    
         flags_group = QGroupBox("Opções de Flags USB")
         flags_layout = QVBoxLayout(flags_group)
         self.chk_force_vid_pid = QCheckBox("Forçar VID/PID")
@@ -276,6 +282,7 @@ class ArduinoSpooferApp(QMainWindow):
         layout.addWidget(flags_group, 0, 1)
         layout.addWidget(arduino_group, 1, 0)
         layout.addWidget(verify_group, 1, 1)
+
 
     def find_default_arduino_path(self):
         base_path = os.path.join(
