@@ -7,17 +7,14 @@
 #include <vector>
 #include <regex>
 
-// Linkagem necessária
 #pragma comment(lib, "setupapi.lib")
 
-// Estrutura para armazenar informações da porta
 struct SerialPortInfo {
     std::string port;
     std::string description;
     std::string hardwareId;
 };
 
-// Função para listar todas as portas seriais
 std::vector<SerialPortInfo> list_serial_ports() {
     std::vector<SerialPortInfo> ports;
 
@@ -52,7 +49,6 @@ std::vector<SerialPortInfo> list_serial_ports() {
         if (RegQueryValueExA(hDeviceRegistryKey, "PortName", nullptr, &type,
             (LPBYTE)portName, &portNameSize) == ERROR_SUCCESS) {
             if (std::regex_match(portName, std::regex("COM[0-9]+"))) {
-                // Descrição do dispositivo
                 char friendlyName[256];
                 DWORD friendlyNameSize = sizeof(friendlyName);
                 if (SetupDiGetDeviceRegistryPropertyA(
@@ -72,7 +68,6 @@ std::vector<SerialPortInfo> list_serial_ports() {
     return ports;
 }
 
-// Funções simuladas (adaptar depois)
 void verify_port(const std::string& port) {
     std::cout << "PASSIVO " << port << std::endl;
 }
@@ -83,7 +78,6 @@ void spoof_device(const std::string& port, const std::string& vid, const std::st
     std::cout << "SPOOF " << port << " VID=" << vid << " PID=" << pid << std::endl;
 }
 
-// ---------------- MAIN ----------------
 int main(int argc, char* argv[]) {
     if (argc < 2) {
         std::cerr << "Uso: serial_tool.exe [list|verify|status|spoof] ..." << std::endl;
@@ -101,7 +95,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc < 3) {
-        std::cerr << "Uso inválido. Porta necessária." << std::endl;
+        std::cerr << "Uso invï¿½lido. Porta necessï¿½ria." << std::endl;
         return 1;
     }
 
@@ -123,7 +117,7 @@ int main(int argc, char* argv[]) {
         spoof_device(port, vid, pid);
     }
     else {
-        std::cerr << "Comando inválido: " << command << std::endl;
+        std::cerr << "Comando invï¿½lido: " << command << std::endl;
         return 1;
     }
 

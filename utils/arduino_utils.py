@@ -9,9 +9,6 @@ import json
 class ArduinoUtils:
     @staticmethod
     def detect_arduino_ports():
-        """
-        Retorna lista de portas que parecem ser Arduino.
-        """
         ports = []
         available_ports = serial.tools.list_ports.comports()
 
@@ -31,15 +28,6 @@ class ArduinoUtils:
 
     @staticmethod
     def upload_sketch(port, arduino_path="", mode="universal"):
-        """
-        Compila e envia um sketch para o Arduino usando arduino-cli (em utils/).
-
-        mode:
-            - "universal" -> firmware/universal_spoofer/
-            - "reset"     -> firmware/reset_arduino/
-            - "blink"     -> firmware/blink_test/
-            - "echo"      -> firmware/echo_test/
-        """
         try:
             if mode == "universal":
                 sketch_path = os.path.join("firmware", "universal_spoofer")
@@ -55,7 +43,6 @@ class ArduinoUtils:
             if not os.path.exists(sketch_path):
                 return False, "", f"Sketch não encontrado: {sketch_path}"
 
-            # Caminho absoluto do arduino-cli.exe
             cli_path = os.path.join("utils", "arduino-cli.exe")
             cli_path = os.path.abspath(cli_path)
 
@@ -64,13 +51,11 @@ class ArduinoUtils:
 
             fqbn = "arduino:avr:leonardo"
 
-            # Compilar (passa a pasta do sketch)
             compile_cmd = [cli_path, "compile", "--fqbn", fqbn, sketch_path]
             compile_proc = subprocess.run(compile_cmd, capture_output=True, text=True)
             if compile_proc.returncode != 0:
                 return False, compile_proc.stdout, compile_proc.stderr
 
-            # Upload (também passa a pasta do sketch)
             upload_cmd = [cli_path, "upload", "-p", port, "--fqbn", fqbn, sketch_path]
             upload_proc = subprocess.run(upload_cmd, capture_output=True, text=True)
 
@@ -81,20 +66,14 @@ class ArduinoUtils:
 
     @staticmethod
     def send_command(port, command, baudrate=115200, timeout=2):
-        """
-        Abre a porta serial e envia um comando simples.
-        Comandos aceitos no firmware: STATUS, SPOOF, RESET, SAVE.
-        """
         try:
             with serial.Serial(port, baudrate, timeout=timeout) as ser:
-                time.sleep(2)  # tempo para estabilizar a conexão
-                ser.reset_input_buffer()  # limpa buffer de entrada
+                time.sleep(2) 
+                ser.reset_input_buffer()  
                 
-                # Envia o comando
                 ser.write(f"{command}\n".encode())
                 time.sleep(0.5)
 
-                # Lê a resposta
                 response = ""
                 start_time = time.time()
                 while time.time() - start_time < timeout:
@@ -102,7 +81,6 @@ class ArduinoUtils:
                         line = ser.readline().decode(errors="ignore").strip()
                         if line:
                             response += line + "\n"
-                            # Para se receber uma resposta completa
                             if any(keyword in line for keyword in ["SUCCESS", "ERROR", "STATUS", "READY"]):
                                 break
                     time.sleep(0.1)
@@ -126,17 +104,11 @@ class ArduinoUtils:
 
     @staticmethod
     def spoof_arduino(port, vid, pid, product_name):
-        """
-        Envia comando SPOOF para configurar VID, PID e nome do produto.
-        """
         command = f'SPOOF {vid} {pid} "{product_name}"'
         return ArduinoUtils.send_command(port, command, timeout=5)
 
     @staticmethod
     def find_arduino_by_vid_pid(vid, pid):
-        """
-        Localiza dispositivo pela combinação VID/PID.
-        """
         ports = serial.tools.list_ports.comports()
         for port in ports:
             if port.vid == vid and port.pid == pid:
@@ -145,9 +117,6 @@ class ArduinoUtils:
 
     @staticmethod
     def list_all_serial_ports():
-        """
-        Lista todas as portas seriais detectadas.
-        """
         ports = serial.tools.list_ports.comports()
         return [{
             "device": port.device,
@@ -160,21 +129,9 @@ class ArduinoUtils:
 
     @staticmethod
     def wait_for_reconnection(old_port, timeout=30, check_interval=1):
-        """
-        Aguarda o Arduino reconectar após spoofing/reset.
-        
-        Args:
-            old_port: Porta original que deve desaparecer
-            timeout: Tempo máximo de espera em segundos
-            check_interval: Intervalo entre verificações em segundos
-        
-        Returns:
-            Nova porta se encontrada, None se timeout
-        """
         print(f"Aguardando reconexão do Arduino (porta {old_port})...")
         start_time = time.time()
         
-        # Primeiro espera a porta original desaparecer
         while time.time() - start_time < timeout:
             ports = ArduinoUtils.list_all_serial_ports()
             old_port_exists = any(p['device'] == old_port for p in ports)
@@ -183,16 +140,13 @@ class ArduinoUtils:
                 break
                 
             time.sleep(check_interval)
-        
-        # Agora procura pela nova porta
+
         start_time = time.time()
         while time.time() - start_time < timeout:
             ports = ArduinoUtils.list_all_serial_ports()
             
-            # Procura por qualquer porta que não seja a original
             for port_info in ports:
                 if port_info['device'] != old_port:
-                    # Verifica se é um Arduino
                     if any(keyword.lower() in port_info['description'].lower() 
                            for keyword in ['arduino', 'usb serial', 'com']):
                         print(f"Novo Arduino encontrado na porta: {port_info['device']}")
@@ -205,15 +159,6 @@ class ArduinoUtils:
 
     @staticmethod
     def run_serial_tool(command_args):
-        """
-        Executa o serial_tool.exe com os argumentos fornecidos.
-        
-        Args:
-            command_args: Lista de argumentos para o serial_tool
-            
-        Returns:
-            (success, output) tuple
-        """
         try:
             serial_tool_path = os.path.join("utils", "serial_tool.exe")
             if not os.path.exists(serial_tool_path):
@@ -238,9 +183,6 @@ class ArduinoUtils:
 
     @staticmethod
     def get_serial_ports_with_info():
-        """
-        Retorna informações detalhadas sobre todas as portas seriais.
-        """
         ports_info = []
         ports = serial.tools.list_ports.comports()
         
@@ -260,20 +202,15 @@ class ArduinoUtils:
 
     @staticmethod
     def check_port_ready(port, baudrate=115200, timeout=3):
-        """
-        Verifica se uma porta serial está respondendo corretamente.
-        """
         try:
             with serial.Serial(port, baudrate, timeout=timeout) as ser:
-                ser.write(b"\n")  # Envia quebra de linha para acordar o dispositivo
+                ser.write(b"\n") 
                 time.sleep(0.5)
                 
-                # Tenta ler qualquer resposta
                 if ser.in_waiting > 0:
                     response = ser.readline().decode().strip()
                     return True, f"Porta respondendo: {response}"
                 else:
-                    # Se não houve resposta, envia comando STATUS
                     ser.write(b"STATUS\n")
                     time.sleep(0.5)
                     

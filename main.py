@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QPushButton, QTextEdit, QProgressBar, QFileDialog,
                              QMessageBox, QTabWidget, QLineEdit, QStatusBar,
                              QAction, QGridLayout, QCheckBox, QMenuBar,
-                             QDesktopWidget)   # <-- adicionado aqui
+                             QDesktopWidget)
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt, QPoint
 from utils.file_manager import FileManager
@@ -16,7 +16,6 @@ from utils.arduino_utils import ArduinoUtils
 from utils.spoof_engine import SpoofEngine
 
 
-# ------------------- TitleBar Customizada -------------------
 class TitleBar(QWidget):
     def __init__(self, parent):
         super().__init__()
@@ -55,7 +54,6 @@ class TitleBar(QWidget):
             event.accept()
 
 
-# ------------------- App Principal -------------------
 class ArduinoSpooferApp(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -65,7 +63,6 @@ class ArduinoSpooferApp(QMainWindow):
         self.arduino_utils = ArduinoUtils()
         self.spoof_engine = SpoofEngine()
 
-        # Inicializa perfis ANTES de montar UI
         self.config = {
             'arduino_path': '',
             'selected_port': '',
@@ -82,7 +79,6 @@ class ArduinoSpooferApp(QMainWindow):
         if not self.mouse_profiles:
             self.mouse_profiles = {"Exemplo": {"Modelo1": {"vid": "0x1234", "pid": "0x5678"}}}
 
-        # Só depois monta a UI
         self.init_ui()
         self.load_settings()
         self.center_window()
@@ -123,7 +119,6 @@ class ArduinoSpooferApp(QMainWindow):
         self.apply_theme()
 
     def center_window(self):
-        """Centraliza a janela na tela"""
         screen = QDesktopWidget().availableGeometry().center()
         frame = self.frameGeometry()
         frame.moveCenter(screen)
@@ -209,12 +204,10 @@ class ArduinoSpooferApp(QMainWindow):
 
         layout.addWidget(path_group)
 
-        # Criar log_text antes de usar log_message
         self.log_text = QTextEdit()
         self.log_text.setReadOnly(True)
         layout.addWidget(self.log_text)
 
-        # 🔎 Busca automática também no Spoofer
         default_path = self.find_default_arduino_path()
         if default_path:
             self.path_edit_spoofer.setText(default_path)
@@ -284,7 +277,6 @@ class ArduinoSpooferApp(QMainWindow):
         layout.addWidget(arduino_group, 1, 0)
         layout.addWidget(verify_group, 1, 1)
 
-    # ------------------ LÓGICA ------------------
     def find_default_arduino_path(self):
         base_path = os.path.join(
             os.path.expanduser("~"),
@@ -428,7 +420,7 @@ class ArduinoSpooferApp(QMainWindow):
         self.log_message(f"boards.txt modificado para {brand} {model} ({vid}:{pid})")
 
         self.log_message("⚡ Enviando firmware universal...")
-        time.sleep(3)  # espera Arduino reconectar
+        time.sleep(3) 
         ok, out, err = self.arduino_utils.upload_sketch(
             port, arduino_path, mode="universal"
         )
@@ -481,7 +473,6 @@ class ArduinoSpooferApp(QMainWindow):
         resp = self.spoof_engine.spoof(port, vid, pid)
         self.log_message(f"SPOOF: {resp}")
 
-    # ------------------ Configuração ------------------
     def load_settings(self):
         try:
             if os.path.exists('config.json'):

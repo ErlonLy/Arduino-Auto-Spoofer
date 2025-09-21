@@ -1,7 +1,7 @@
 #include <EEPROM.h>
 #include <Mouse.h>
 
-// Estrutura de configuração persistida
+
 struct Config {
   uint16_t vid;
   uint16_t pid;
@@ -12,7 +12,7 @@ struct Config {
 
 Config config;
 
-// ---------- Defaults vindos do boards.txt ----------
+
 #ifndef USB_VID
 #define USB_VID 0x2341
 #endif
@@ -28,7 +28,7 @@ Config config;
 #ifndef USB_MANUFACTURER
 #define USB_MANUFACTURER "Arduino"
 #endif
-// ---------------------------------------------------
+
 
 void setup() {
   Serial.begin(115200);
@@ -108,7 +108,7 @@ void printStatus() {
 }
 
 void handleSpoofCommand(String command) {
-  // Formato: SPOOF VID PID "Product" "Manufacturer"
+
   int firstSpace = command.indexOf(' ');
   if (firstSpace <= 0) {
     Serial.println("ERROR:INVALID_SPOOF_FORMAT");
@@ -137,7 +137,6 @@ void handleSpoofCommand(String command) {
   String remaining = rest.substring(thirdSpace + 1);
   remaining.trim();
 
-  // Produto e fabricante em aspas
   String product, manufacturer;
   int firstQuote = remaining.indexOf('"');
   if (firstQuote >= 0) {
@@ -154,7 +153,7 @@ void handleSpoofCommand(String command) {
     }
   }
 
-  // Remove prefixos
+
   if (vidStr.startsWith("0x") || vidStr.startsWith("0X")) vidStr = vidStr.substring(2);
   if (pidStr.startsWith("0x") || pidStr.startsWith("0X")) pidStr = pidStr.substring(2);
 

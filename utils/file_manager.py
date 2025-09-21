@@ -8,13 +8,9 @@ class FileManager:
     def __init__(self):
         self.backup_dir = "backups"
         os.makedirs(self.backup_dir, exist_ok=True)
-        # Template mínimo do boards.txt
         self.template_file = os.path.join("boards_templates", "boards.txt")
 
     def _find_boards_file(self, arduino_path):
-        """
-        Localiza boards.txt dentro do Arduino AVR
-        """
         possible_paths = [
             os.path.join(arduino_path, "packages", "arduino", "hardware", "avr"),
             os.path.join(arduino_path, "hardware", "arduino", "avr"),
@@ -28,9 +24,6 @@ class FileManager:
         return None
 
     def backup_boards_file(self, arduino_path):
-        """
-        Copia o boards.txt original para a pasta de backups
-        """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
@@ -46,9 +39,6 @@ class FileManager:
             return None
 
     def restore_backup(self, backup_file, arduino_path):
-        """
-        Restaura um backup anterior
-        """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
@@ -62,10 +52,6 @@ class FileManager:
             return False
 
     def modify_boards_file(self, arduino_path, profile):
-        """
-        Substitui o boards.txt do usuário pelo template mínimo
-        e injeta apenas as extra_flags.
-        """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
@@ -76,11 +62,9 @@ class FileManager:
                 print(f"⚠️ Template não encontrado: {self.template_file}")
                 return False
 
-            # Lê template base
             with open(self.template_file, "r", encoding="utf-8") as f:
                 content = f.read()
 
-            # Monta extra_flags
             flags = []
             if profile.get("force_vid_pid", False):
                 flags.append(f"-DUSB_VID={profile['vid']} -DUSB_PID={profile['pid']}")
@@ -93,13 +77,10 @@ class FileManager:
 
             extra_flags = " ".join(flags)
 
-            # Substitui placeholder {EXTRA_FLAGS}
             content = content.replace("{EXTRA_FLAGS}", extra_flags)
 
-            # Backup do boards.txt atual
             self.backup_boards_file(arduino_path)
 
-            # Escreve no boards.txt real
             with open(boards_path, "w", encoding="utf-8") as f:
                 f.write(content)
 
@@ -113,9 +94,6 @@ class FileManager:
             return False
 
     def _clean_arduino_cache(self):
-        """
-        Limpa cache do Arduino CLI
-        """
         try:
             cli_path = os.path.join("utils", "arduino-cli.exe")
             if os.path.exists(cli_path):
@@ -137,9 +115,6 @@ class FileManager:
             print(f"⚠️ Erro ao limpar cache: {e}")
 
     def verify_modification(self, arduino_path, expected_vid, expected_pid):
-        """
-        Confere se boards.txt foi modificado corretamente
-        """
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
@@ -154,12 +129,7 @@ class FileManager:
         except Exception as e:
             return False, f"Erro na verificação: {str(e)}"
 
-    # ---------------- NOVA FUNÇÃO ----------------
     def check_spoof_trace(self, arduino_path):
-        """
-        Verifica se o bloco do Leonardo no boards.txt está idêntico ao padrão de fábrica.
-        Se houver qualquer diferença ou flags extras → rastro de spoofer detectado.
-        """
         factory_block = {
             "leonardo.name": "Arduino Leonardo",
             "leonardo.vid.0": "0x2341",

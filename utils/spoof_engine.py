@@ -9,7 +9,6 @@ class SpoofEngine:
         self.port = None
         self.profiles = self.load_profiles()
 
-    # ---------------- PERFIS ----------------
     def load_profiles(self, file_path=None):
         try:
             if file_path is None:
@@ -31,7 +30,6 @@ class SpoofEngine:
     def get_profile(self, brand, model):
         return self.profiles.get(brand, {}).get(model, None)
 
-    # ---------------- SERIAL TOOL ----------------
     def run_tool(self, args):
         try:
             cmd = [self.serial_tool_path] + args
@@ -55,7 +53,6 @@ class SpoofEngine:
         except Exception as e:
             return False, str(e)
 
-    # ---------------- OPERAÇÕES ----------------
     def verify(self, port):
         ok, resp = self.run_tool(["verify", port])
         if not ok:
