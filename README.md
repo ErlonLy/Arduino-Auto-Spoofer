@@ -89,9 +89,9 @@ Arduino-Auto-Spoofer/
 
 ## 📌 Observações
 
-- O projeto foi testado com **Arduino Leonardo** (ATmega32u4).  
+- O projeto foi testado com **Arduino Leonardo R3** (ATmega32u4).  
 - Para funcionamento correto, é necessário que o **Arduino IDE** ou **Arduino CLI** esteja instalado no sistema.  
-
+- Projeto aberto para o público , então se quiser contribuir , é bem vinda a ajuda.
 ---
 
 ## 📝 Licença
