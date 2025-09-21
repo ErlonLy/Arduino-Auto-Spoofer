@@ -1,6 +1,6 @@
 # 🎯 Arduino Mouse Spoofer
 
-Projeto feito para ajudar a comunidade 
+Projeto feito para ajudar a comunidade, por favor deem estrelas ⭐ para esse projeto, assim me motiva a atualizar e criar novos.
 
 ---
 
