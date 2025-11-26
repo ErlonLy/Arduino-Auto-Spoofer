@@ -117,7 +117,7 @@ int main(int argc, char* argv[]) {
         spoof_device(port, vid, pid);
     }
     else {
-        std::cerr << "Comando inv�lido: " << command << std::endl;
+        std::cerr << "Comando inválido: " << command << std::endl;
         return 1;
     }
 
