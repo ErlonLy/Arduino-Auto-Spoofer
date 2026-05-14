@@ -15,7 +15,6 @@ from utils.file_manager import FileManager
 from utils.arduino_utils import ArduinoUtils
 from utils.spoof_engine import SpoofEngine
 
-
 class TitleBar(QWidget):
     def __init__(self, parent):
         super().__init__()
@@ -37,7 +36,7 @@ class TitleBar(QWidget):
         self.minButton.clicked.connect(self.parent.showMinimized)
         layout.addWidget(self.minButton)
 
-        self.closeButton = QPushButton("✕")
+        self.closeButton = QPushButton("")
         self.closeButton.setFixedSize(40, 25)
         self.closeButton.setObjectName("closeButton")
         self.closeButton.clicked.connect(self.parent.close)
@@ -52,7 +51,6 @@ class TitleBar(QWidget):
         if event.buttons() == Qt.LeftButton:
             self.parent.move(event.globalPos() - self.parent.dragPosition)
             event.accept()
-
 
 class ArduinoSpooferApp(QMainWindow):
     def __init__(self):
@@ -211,9 +209,9 @@ class ArduinoSpooferApp(QMainWindow):
         default_path = self.find_default_arduino_path()
         if default_path:
             self.path_edit_spoofer.setText(default_path)
-            self.log_message(f"✅ Caminho Arduino encontrado: {default_path}")
+            self.log_message(f" Caminho Arduino encontrado: {default_path}")
         else:
-            self.log_message("⚠️ Pasta do Arduino não encontrada, favor buscar manualmente.")
+            self.log_message(" Pasta do Arduino não encontrada, favor buscar manualmente.")
 
         action_layout = QHBoxLayout()
         self.spoof_btn = QPushButton("Executar Spoofer")
@@ -243,7 +241,6 @@ class ArduinoSpooferApp(QMainWindow):
     def setup_config_tab(self, tab):
         layout = QGridLayout(tab)
 
-    
         fw_group = QGroupBox("Firmware")
         fw_layout = QVBoxLayout(fw_group)
 
@@ -253,9 +250,9 @@ class ArduinoSpooferApp(QMainWindow):
 
         self.fw_combo = QComboBox()
         self.fw_combo.addItems(["universal", "blink_test"])
-        self.fw_combo.setFixedWidth(250)  
+        self.fw_combo.setFixedWidth(250)
         fw_layout.addWidget(self.fw_combo, alignment=Qt.AlignCenter)
-    
+
         flags_group = QGroupBox("Opções de Flags USB")
         flags_layout = QVBoxLayout(flags_group)
         self.chk_force_vid_pid = QCheckBox("Forçar VID/PID")
@@ -282,7 +279,6 @@ class ArduinoSpooferApp(QMainWindow):
         layout.addWidget(flags_group, 0, 1)
         layout.addWidget(arduino_group, 1, 0)
         layout.addWidget(verify_group, 1, 1)
-
 
     def find_default_arduino_path(self):
         base_path = os.path.join(
@@ -327,11 +323,11 @@ class ArduinoSpooferApp(QMainWindow):
             port, self.path_edit_spoofer.text(), mode="blink"
         )
         if ok:
-            self.port_status_label.setText("Status: ✅ Sucesso")
+            self.port_status_label.setText("Status:  Sucesso")
             self.port_status_label.setStyleSheet("color: #4caf50; font-weight: bold;")
-            self.log_message(f"{port}  ✅ Verificado com Sucesso !!!")
+            self.log_message(f"{port}   Verificado com Sucesso !!!")
         else:
-            self.port_status_label.setText("Status: ❌ Falha")
+            self.port_status_label.setText("Status:  Falha")
             self.port_status_label.setStyleSheet("color: #f44336; font-weight: bold;")
             self.log_message(f"Falha ao enviar blink_test.ino: {err or out}")
 
@@ -350,7 +346,7 @@ class ArduinoSpooferApp(QMainWindow):
     def verify_spoof_status(self):
         arduino_path = self.path_edit_config.text().strip()
         if not arduino_path:
-            self.log_message("⚠️ Caminho do Arduino não definido.")
+            self.log_message(" Caminho do Arduino não definido.")
             return
 
         profile = self.config.get("mouse_profile")
@@ -360,7 +356,7 @@ class ArduinoSpooferApp(QMainWindow):
             profile = self.spoof_engine.get_profile(brand, model)
 
         if not profile:
-            self.log_message("⚠️ Nenhum perfil carregado ou selecionado.")
+            self.log_message(" Nenhum perfil carregado ou selecionado.")
             return
 
         vid = profile.get("vid")
@@ -368,9 +364,9 @@ class ArduinoSpooferApp(QMainWindow):
 
         ok, msg = self.file_manager.check_spoof_trace(arduino_path)
         if ok:
-            self.log_message(f"✅ Spoof detectado: {msg}")
+            self.log_message(f" Spoof detectado: {msg}")
         else:
-            self.log_message(f"❌ Spoof não encontrado: {msg}")
+            self.log_message(f" Spoof não encontrado: {msg}")
 
     def execute_spoof(self):
         if not self.validate_inputs():
@@ -407,7 +403,7 @@ class ArduinoSpooferApp(QMainWindow):
         if backup:
             self.log_message(f"Backup criado: {backup}")
         else:
-            self.log_message("⚠️ Não foi possível criar backup do boards.txt")
+            self.log_message(" Não foi possível criar backup do boards.txt")
 
         ok = self.file_manager.modify_boards_file(
             arduino_path,
@@ -422,21 +418,21 @@ class ArduinoSpooferApp(QMainWindow):
             }
         )
         if not ok:
-            self.log_message("❌ Falha ao modificar boards.txt")
+            self.log_message(" Falha ao modificar boards.txt")
             return
         self.log_message(f"boards.txt modificado para {brand} {model} ({vid}:{pid})")
 
-        self.log_message("⚡ Enviando firmware universal...")
-        time.sleep(3) 
+        self.log_message(" Enviando firmware universal...")
+        time.sleep(3)
         ok, out, err = self.arduino_utils.upload_sketch(
             port, arduino_path, mode="universal"
         )
 
         if not ok:
-            self.log_message(f"❌ Falha ao enviar universal_spoofer.ino: {err or out}")
+            self.log_message(f" Falha ao enviar universal_spoofer.ino: {err or out}")
             return
 
-        self.log_message("✅ Firmware universal enviado, aguardando reconexão...")
+        self.log_message(" Firmware universal enviado, aguardando reconexão...")
         self.progress_bar.setValue(100)
 
     def validate_inputs(self):
@@ -527,7 +523,6 @@ class ArduinoSpooferApp(QMainWindow):
     def show_about(self):
         QMessageBox.about(self, "Sobre","Arduino Mouse Spoofer automatico\n\n \tFeito por Lyrien")
 
-
 def main():
     app = QApplication(sys.argv)
     font = QFont("Segoe UI", 9)
@@ -535,7 +530,6 @@ def main():
     window = ArduinoSpooferApp()
     window.show()
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()

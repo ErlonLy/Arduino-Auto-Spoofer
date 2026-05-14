@@ -95,7 +95,7 @@ int main(int argc, char* argv[]) {
     }
 
     if (argc < 3) {
-        std::cerr << "Uso inv�lido. Porta necess�ria." << std::endl;
+        std::cerr << "Uso invlido. Porta necessria." << std::endl;
         return 1;
     }
 

@@ -3,7 +3,6 @@ import shutil
 import subprocess
 from datetime import datetime
 
-
 class FileManager:
     def __init__(self):
         self.backup_dir = "backups"
@@ -27,39 +26,39 @@ class FileManager:
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
-                print("⚠️ boards.txt não encontrado para backup")
+                print(" boards.txt não encontrado para backup")
                 return None
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_file = os.path.join(self.backup_dir, f"boards_{timestamp}.txt")
             shutil.copy2(boards_path, backup_file)
-            print(f"✅ Backup criado: {backup_file}")
+            print(f" Backup criado: {backup_file}")
             return backup_file
         except Exception as e:
-            print(f"❌ Erro no backup: {e}")
+            print(f" Erro no backup: {e}")
             return None
 
     def restore_backup(self, backup_file, arduino_path):
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
-                print("⚠️ boards.txt não encontrado para restauração")
+                print(" boards.txt não encontrado para restauração")
                 return False
             shutil.copy2(backup_file, boards_path)
-            print(f"✅ Backup restaurado: {backup_file}")
+            print(f" Backup restaurado: {backup_file}")
             return True
         except Exception as e:
-            print(f"❌ Erro na restauração: {e}")
+            print(f" Erro na restauração: {e}")
             return False
 
     def modify_boards_file(self, arduino_path, profile):
         try:
             boards_path = self._find_boards_file(arduino_path)
             if not boards_path:
-                print("⚠️ boards.txt não encontrado para modificação")
+                print(" boards.txt não encontrado para modificação")
                 return False
 
             if not os.path.exists(self.template_file):
-                print(f"⚠️ Template não encontrado: {self.template_file}")
+                print(f" Template não encontrado: {self.template_file}")
                 return False
 
             with open(self.template_file, "r", encoding="utf-8") as f:
@@ -71,7 +70,7 @@ class FileManager:
             if profile.get("force_product_manufacturer", False):
                 usb_product = profile.get("usb_product", profile.get("product", "Arduino Leonardo"))
                 usb_manufacturer = profile.get("usb_manufacturer", profile.get("manufacturer", "Arduino"))
-                # Mantém espaços, mas envolve em aspas para string literal válida
+
                 flags.append(f'-DUSB_PRODUCT="{usb_product}"')
                 flags.append(f'-DUSB_MANUFACTURER="{usb_manufacturer}"')
 
@@ -85,10 +84,10 @@ class FileManager:
                 f.write(content)
 
             self._clean_arduino_cache()
-            print("✅ boards.txt atualizado com sucesso (via template mínimo)")
+            print(" boards.txt atualizado com sucesso (via template mínimo)")
             return True
         except Exception as e:
-            print(f"❌ Erro detalhado ao modificar boards.txt: {str(e)}")
+            print(f" Erro detalhado ao modificar boards.txt: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
@@ -109,10 +108,10 @@ class FileManager:
             for temp_dir in temp_dirs:
                 if os.path.exists(temp_dir):
                     shutil.rmtree(temp_dir, ignore_errors=True)
-                    print(f"🧹 Diretório temporário limpo: {temp_dir}")
+                    print(f" Diretório temporário limpo: {temp_dir}")
 
         except Exception as e:
-            print(f"⚠️ Erro ao limpar cache: {e}")
+            print(f" Erro ao limpar cache: {e}")
 
     def verify_modification(self, arduino_path, expected_vid, expected_pid):
         try:
@@ -191,12 +190,11 @@ class FileManager:
             key, value = line.split("=", 1)
             key, value = key.strip(), value.strip()
             if key not in factory_block:
-                return True, f"⚠️ Rastro detectado: chave extra '{key}'"
+                return True, f" Rastro detectado: chave extra '{key}'"
             if key == "leonardo.build.extra_flags":
                 if value != "{build.usb_flags}":
-                    return True, f"⚠️ Rastro detectado: extra_flags adulterado → {value}"
+                    return True, f" Rastro detectado: extra_flags adulterado  {value}"
             elif value != factory_block[key]:
-                return True, f"⚠️ Rastro detectado: {key} esperado '{factory_block[key]}', encontrado '{value}'"
+                return True, f" Rastro detectado: {key} esperado '{factory_block[key]}', encontrado '{value}'"
 
-        return False, "✅ boards.txt está no padrão original"
-
+        return False, " boards.txt está no padrão original"

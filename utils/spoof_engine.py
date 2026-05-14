@@ -2,7 +2,6 @@ import os
 import subprocess
 import json
 
-
 class SpoofEngine:
     def __init__(self, serial_tool_path="utils/serial_tool.exe"):
         self.serial_tool_path = serial_tool_path

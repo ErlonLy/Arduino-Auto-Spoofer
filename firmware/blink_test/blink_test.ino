@@ -15,5 +15,5 @@ void loop() {
     delay(1000);
   }
   Serial.println("TEST_COMPLETE");
-  while (true) { delay(1000); } 
+  while (true) { delay(1000); }
 }

@@ -5,7 +5,6 @@ import time
 import os
 import json
 
-
 class ArduinoUtils:
     @staticmethod
     def detect_arduino_ports():
@@ -68,9 +67,9 @@ class ArduinoUtils:
     def send_command(port, command, baudrate=115200, timeout=2):
         try:
             with serial.Serial(port, baudrate, timeout=timeout) as ser:
-                time.sleep(2) 
-                ser.reset_input_buffer()  
-                
+                time.sleep(2)
+                ser.reset_input_buffer()
+
                 ser.write(f"{command}\n".encode())
                 time.sleep(0.5)
 
@@ -131,29 +130,29 @@ class ArduinoUtils:
     def wait_for_reconnection(old_port, timeout=30, check_interval=1):
         print(f"Aguardando reconexão do Arduino (porta {old_port})...")
         start_time = time.time()
-        
+
         while time.time() - start_time < timeout:
             ports = ArduinoUtils.list_all_serial_ports()
             old_port_exists = any(p['device'] == old_port for p in ports)
-            
+
             if not old_port_exists:
                 break
-                
+
             time.sleep(check_interval)
 
         start_time = time.time()
         while time.time() - start_time < timeout:
             ports = ArduinoUtils.list_all_serial_ports()
-            
+
             for port_info in ports:
                 if port_info['device'] != old_port:
-                    if any(keyword.lower() in port_info['description'].lower() 
+                    if any(keyword.lower() in port_info['description'].lower()
                            for keyword in ['arduino', 'usb serial', 'com']):
                         print(f"Novo Arduino encontrado na porta: {port_info['device']}")
                         return port_info['device']
-            
+
             time.sleep(check_interval)
-        
+
         print("Timeout aguardando reconexão do Arduino")
         return None
 
@@ -163,19 +162,19 @@ class ArduinoUtils:
             serial_tool_path = os.path.join("utils", "serial_tool.exe")
             if not os.path.exists(serial_tool_path):
                 return False, "serial_tool.exe não encontrado"
-            
+
             result = subprocess.run(
                 [serial_tool_path] + command_args,
                 capture_output=True,
                 text=True,
                 timeout=10
             )
-            
+
             if result.returncode == 0:
                 return True, result.stdout.strip()
             else:
                 return False, result.stderr.strip() or result.stdout.strip()
-                
+
         except subprocess.TimeoutExpired:
             return False, "Timeout ao executar serial_tool"
         except Exception as e:
@@ -185,7 +184,7 @@ class ArduinoUtils:
     def get_serial_ports_with_info():
         ports_info = []
         ports = serial.tools.list_ports.comports()
-        
+
         for port in ports:
             port_info = {
                 'device': port.device,
@@ -197,29 +196,29 @@ class ArduinoUtils:
                 'product': port.product or "N/A"
             }
             ports_info.append(port_info)
-        
+
         return ports_info
 
     @staticmethod
     def check_port_ready(port, baudrate=115200, timeout=3):
         try:
             with serial.Serial(port, baudrate, timeout=timeout) as ser:
-                ser.write(b"\n") 
+                ser.write(b"\n")
                 time.sleep(0.5)
-                
+
                 if ser.in_waiting > 0:
                     response = ser.readline().decode().strip()
                     return True, f"Porta respondendo: {response}"
                 else:
                     ser.write(b"STATUS\n")
                     time.sleep(0.5)
-                    
+
                     if ser.in_waiting > 0:
                         response = ser.readline().decode().strip()
                         return True, f"Resposta ao STATUS: {response}"
                     else:
                         return False, "Porta não responde"
-                        
+
         except serial.SerialException as e:
             return False, f"Erro de comunicação: {str(e)}"
         except Exception as e:

@@ -1,7 +1,6 @@
 #include <EEPROM.h>
 #include <Mouse.h>
 
-
 struct Config {
   uint16_t vid;
   uint16_t pid;
@@ -11,7 +10,6 @@ struct Config {
 };
 
 Config config;
-
 
 #ifndef USB_VID
 #define USB_VID 0x2341
@@ -29,12 +27,10 @@ Config config;
 #define USB_MANUFACTURER "Arduino"
 #endif
 
-
 void setup() {
   Serial.begin(115200);
   while (!Serial) { delay(10); }
 
-  // Lê configuração da EEPROM
   EEPROM.get(0, config);
 
   if (!config.configured) {
@@ -83,7 +79,6 @@ void loop() {
     }
   }
 
-  // Mantém HID ativo
   static unsigned long lastMove = 0;
   if (millis() - lastMove > 5000) {
     Mouse.move(1, 0, 0);
@@ -152,7 +147,6 @@ void handleSpoofCommand(String command) {
       }
     }
   }
-
 
   if (vidStr.startsWith("0x") || vidStr.startsWith("0X")) vidStr = vidStr.substring(2);
   if (pidStr.startsWith("0x") || pidStr.startsWith("0X")) pidStr = pidStr.substring(2);
